@@ -196,8 +196,8 @@
   <!-- доступа нет -->
   <section id="gate" class="card gate" hidden>
     <h2><span class="n">!</span>Доступа нет</h2>
-    <p class="hint" style="margin-top:0">Страница открывается только по личной ссылке. Если ссылка есть — откройте её заново или введите ключ из неё.</p>
-    <label class="f"><span>Ключ доступа</span><input type="text" id="gate-key" autocomplete="off" spellcheck="false" placeholder="ключ из ссылки"></label>
+    <p class="hint" style="margin-top:0">Страница открывается только по личной ссылке. Откройте свою ссылку заново или вставьте её целиком в поле ниже — ключ подставится сам.</p>
+    <label class="f"><span>Ключ доступа</span><input type="text" id="gate-key" autocomplete="off" spellcheck="false" placeholder="ссылка или ключ из неё"></label>
     <button class="btn btn-main" id="gate-go" type="button">Войти</button>
     <div class="err" id="gate-msg"></div>
   </section>
@@ -352,11 +352,16 @@ setupCityAC();
 // ---------- доступ ----------
 let KEY = '';
 (function () {
+  // Ключ остаётся в адресе: так работают закладки и иконка «На экран Домой» на iPhone (у неё своя память, отдельная от Safari).
   const u = new URL(location.href); const k = u.searchParams.get('k');
-  try { if (k) { localStorage.setItem(LS, k); u.searchParams.delete('k'); history.replaceState(null, '', u.pathname + (u.search || '') + u.hash); } KEY = localStorage.getItem(LS) || ''; } catch (e) { KEY = k || ''; }
+  try {
+    if (k) localStorage.setItem(LS, k);
+    KEY = k || localStorage.getItem(LS) || '';
+    if (KEY && !k) { u.searchParams.set('k', KEY); history.replaceState(null, '', u.pathname + '?' + u.searchParams.toString() + u.hash); }
+  } catch (e) { KEY = k || ''; }
 })();
 function showGate(msg) { $('app').hidden = true; $('done').hidden = true; $('recent-card').hidden = true; $('stamp').hidden = true; $('gate').hidden = false; $('gate-msg').textContent = msg || ''; $('gate-msg').classList.toggle('show', !!msg); }
-$('gate-go').onclick = () => { const k = $('gate-key').value.trim(); if (!k) return; KEY = k; try { localStorage.setItem(LS, k); } catch (e) {} boot(); };
+$('gate-go').onclick = () => { let k = $('gate-key').value.trim(); if (!k) return; const m = /[?&]k=([^&#\s]+)/.exec(k); if (m) k = m[1]; KEY = k; try { localStorage.setItem(LS, k); } catch (e) {} try { const u = new URL(location.href); u.searchParams.set('k', k); history.replaceState(null, '', u.pathname + '?' + u.searchParams.toString()); } catch (e) {} boot(); };
 $('gate-key').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); $('gate-go').click(); } });
 
 // ---------- расчёт (1:1 с листом «Калькулятор_концерт») ----------
