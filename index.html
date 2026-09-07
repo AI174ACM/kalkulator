@@ -116,6 +116,11 @@
   td input.rate-in{width:64px;font:inherit;font-size:13px;color:var(--soft);background:var(--field);border:1px solid var(--line2);border-radius:8px;padding:5px 8px;text-align:right}
   td input.rate-in:focus{border-color:var(--accent);outline:none}
   .t{font-size:11px;padding:2px 8px;border-radius:6px;background:var(--line);color:var(--soft);white-space:nowrap}
+  .recent td:last-child,.recent th:last-child{padding-left:14px;text-align:right}
+  .recent tr.new td{background:rgba(255,214,10,.08)}
+  .recent tr.new td:first-child{border-left:3px solid var(--accent);padding-left:8px}
+  .recent .badge{font-size:11px;padding:2px 8px;border-radius:6px;background:var(--accent);color:var(--accent-text);font-weight:700;margin-left:8px;white-space:nowrap}
+  .card h2 a.tip{text-decoration:none;color:var(--accent)}
 
   /* ---------- кнопки ---------- */
   a{color:var(--accent)}
@@ -242,13 +247,6 @@
     </div>
     <div class="err" id="err"></div>
 
-    <details style="border:0;margin-top:26px">
-      <summary>Последние строки в таблице</summary>
-      <div class="in">
-        <table><thead><tr><th>Дата</th><th>Город</th><th>Заказчик</th><th class="r">Сумма</th><th></th></tr></thead><tbody id="recent"><tr><td colspan="5" class="hint">загрузка…</td></tr></tbody></table>
-        <p class="hint" style="margin:12px 0 0"><a id="sheet-link" href="#" target="_blank" rel="noopener">Открыть лист «Концерты_корпоративы 2026» ↗</a></p>
-      </div>
-    </details>
   </form>
 
   <!-- готово -->
@@ -256,10 +254,16 @@
     <div class="ok">✔</div>
     <h2>Строка добавлена</h2>
     <p id="done-msg"></p>
+    <div id="done-rows" style="text-align:left;max-width:460px;margin:0 auto 22px"></div>
     <div class="actions">
       <a class="btn btn-alt" id="done-open" href="#" target="_blank" rel="noopener">Открыть в таблице</a>
       <button class="btn btn-main" id="done-new" type="button">Новый расчёт</button>
     </div>
+  </section>
+
+  <section class="card recent" id="recent-card" hidden>
+    <h2><span class="n">≡</span>Последние строки в таблице<a class="tip" id="sheet-link" href="#" target="_blank" rel="noopener">открыть лист ↗</a></h2>
+    <div style="overflow-x:auto"><table><thead><tr><th>Дата</th><th>Город</th><th>Заказчик</th><th class="r">Сумма</th><th></th></tr></thead><tbody id="recent"><tr><td colspan="5" class="hint">загрузка…</td></tr></tbody></table></div>
   </section>
 
   <p class="foot" id="foot">Как разносим приход: НДС = сумма × 5/105 → УСН = (сумма − НДС) × 6 % → Брылин ÷ 0,93, Петрушенко 10 % от чистой, админ 7 % ÷ 0,93 → Гостюхин на руки → остальное (доп. расходы, хвост округления) оборотка.</p>
@@ -294,7 +298,7 @@ let KEY = '';
   const u = new URL(location.href); const k = u.searchParams.get('k');
   try { if (k) { localStorage.setItem(LS, k); u.searchParams.delete('k'); history.replaceState(null, '', u.pathname + (u.search || '') + u.hash); } KEY = localStorage.getItem(LS) || ''; } catch (e) { KEY = k || ''; }
 })();
-function showGate(msg) { $('app').hidden = true; $('done').hidden = true; $('stamp').hidden = true; $('gate').hidden = false; $('gate-msg').textContent = msg || ''; $('gate-msg').classList.toggle('show', !!msg); }
+function showGate(msg) { $('app').hidden = true; $('done').hidden = true; $('recent-card').hidden = true; $('stamp').hidden = true; $('gate').hidden = false; $('gate-msg').textContent = msg || ''; $('gate-msg').classList.toggle('show', !!msg); }
 $('gate-go').onclick = () => { const k = $('gate-key').value.trim(); if (!k) return; KEY = k; try { localStorage.setItem(LS, k); } catch (e) {} boot(); };
 $('gate-key').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); $('gate-go').click(); } });
 
@@ -428,7 +432,7 @@ function resetAll(keepDate) {
   hideErr(); render();
 }
 $('reset').onclick = () => { resetAll(); window.scrollTo({ top: 0, behavior: 'smooth' }); };
-$('done-new').onclick = () => { $('done').hidden = true; $('app').hidden = false; resetAll(); window.scrollTo({ top: 0, behavior: 'smooth' }); };
+$('done-new').onclick = () => { $('done').hidden = true; $('app').hidden = false; lastSaved = null; document.querySelectorAll('#recent tr.new').forEach(tr => { tr.classList.remove('new'); const b = tr.querySelector('.badge'); if (b) b.remove(); }); resetAll(); window.scrollTo({ top: 0, behavior: 'smooth' }); };
 
 // ---------- связь с таблицей ----------
 async function api(method, payload) {
@@ -438,15 +442,17 @@ async function api(method, payload) {
   const txt = await res.text();
   try { return JSON.parse(txt); } catch (e) { throw new Error('таблица ответила не по-русски: ' + txt.slice(0, 80)); }
 }
+let lastSaved = null;
 function fillRefs(refs) {
   $('cities').innerHTML = refs.cities.map(c => `<option value="${c.replace(/"/g, '&quot;')}">`).join('');
   $('sheet-link').href = refs.sheetUrl;
-  $('recent').innerHTML = refs.recent.length ? refs.recent.map(r => `<tr><td>${r.date}</td><td>${r.city}</td><td>${r.cp}</td><td class="r"><b>${fmt0(r.sum)}</b></td><td><span class="t" style="background:${TYPE_BG[r.type] || 'var(--line)'};color:#0b0b0d">${r.type || ''}</span></td></tr>`).join('') : '<tr><td colspan="5" class="hint">пусто</td></tr>';
+  const isNew = r => lastSaved && r.date === lastSaved.date && r.city === lastSaved.city && Math.abs(r.sum - lastSaved.sum) < 0.01;
+  $('recent').innerHTML = refs.recent.length ? refs.recent.map(r => `<tr class="${isNew(r) ? 'new' : ''}"><td>${r.date}${isNew(r) ? '<span class="badge">новая</span>' : ''}</td><td>${r.city}</td><td>${r.cp}</td><td class="r"><b>${fmt0(r.sum)}</b></td><td><span class="t" style="background:${TYPE_BG[r.type] || 'var(--line)'};color:#0b0b0d">${r.type || ''}</span></td></tr>`).join('') : '<tr><td colspan="5" class="hint">пусто</td></tr>';
 }
 function stamp(cls, text) { const s = $('stamp'); s.hidden = false; s.className = 'stamp ' + cls; $('stamp-t').textContent = text; }
 async function boot() {
   if (!KEY) { showGate(''); return; }
-  $('gate').hidden = true; $('app').hidden = false;
+  $('gate').hidden = true; $('app').hidden = false; $('recent-card').hidden = false;
   if (!$('date').value) $('date').value = new Date().toISOString().slice(0, 10);
   render();
   if (!API_URL || API_URL.indexOf('http') !== 0) { stamp('bad', 'таблица не подключена'); return; }
@@ -485,8 +491,13 @@ $('cf-yes').onclick = async () => {
     const d = await api('POST', { k: KEY, row });
     if (!d.ok) throw new Error(d.error || 'не записалось');
     $('veil').hidden = true;
-    $('done-msg').textContent = `Строка ${d.rowNumber} в листе «Концерты_корпоративы 2026»: ${row.date.split('-').reverse().join('.')}, ${row.city}, ${fmt(row.sum)}. Гостюхин на руки ${fmt(cur.C14)}, оборотка ${fmt(cur.obor)}` + (typeof d.check === 'number' ? `, проверка листа ${d.check}.` : '.');
+    $('done-msg').textContent = `Строка ${d.rowNumber} в листе «Концерты_корпоративы 2026»: ${row.date.split('-').reverse().join('.')}, ${row.city}, ${row.type}` + (typeof d.check === 'number' ? `. Проверка листа: ${d.check}.` : '.');
     $('done-open').href = d.url;
+    lastSaved = { date: row.date.split('-').reverse().join('.'), city: row.city, sum: row.sum };
+    $('done-rows').innerHTML = [
+      ['Приход в таблицу', fmt(row.sum), true], ['НДС 5 %', fmt(d.nds)], ['УСН 6 %', fmt(d.usn)],
+      ['Гостюхин (на руки + оборотка)', fmt(d.gost)], ...(cur.ad ? [] : [['ИП Брылин', fmt(row.bryl)]]), ['Петрушенко', fmt(row.petr)], ['Админ', fmt(row.adm)]
+    ].map(([k, v, t]) => `<div class="kv${t ? ' total' : ''}"><span>${k}</span><b>${v}</b></div>`).join('');
     $('app').hidden = true; $('done').hidden = false;
     window.scrollTo({ top: 0, behavior: 'smooth' });
     try { const r = await api('GET'); if (r.ok) fillRefs(r.refs); } catch (e) {}
