@@ -62,6 +62,12 @@
   input.bad{border-color:var(--err);box-shadow:0 0 0 4px rgba(255,92,92,.15)}
   input[readonly]{background:rgba(61,220,132,.07);border-color:rgba(61,220,132,.3);color:var(--soft);cursor:default}
   input[readonly]:focus{border-color:rgba(61,220,132,.3);box-shadow:none}
+  .ac{position:relative}
+  .ac-list{position:absolute;left:0;right:0;top:100%;margin-top:6px;background:var(--card);border:1px solid var(--line2);border-radius:12px;box-shadow:0 20px 50px rgba(0,0,0,.5);z-index:20;overflow:hidden;max-height:320px;overflow-y:auto}
+  .ac-list div{padding:11px 14px;font-size:15px;color:var(--soft);cursor:pointer;border-bottom:1px solid var(--line)}
+  .ac-list div:last-child{border-bottom:0}
+  .ac-list div b{color:var(--text);font-weight:700}
+  .ac-list div.on,.ac-list div:hover{background:rgba(255,214,10,.1);color:var(--text)}
   .money{position:relative}
   .money input{text-align:right;padding-right:34px;font-variant-numeric:tabular-nums;font-weight:600}
   .money::after{content:"₽";position:absolute;right:14px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:14px;pointer-events:none}
@@ -180,7 +186,7 @@
       <h2><span class="n">1</span>О концерте<span class="tip">поля со звёздочкой обязательны</span></h2>
       <div class="row">
         <label class="f"><span class="req">Дата концерта</span><input type="date" id="date" data-req="Дата концерта"></label>
-        <label class="f"><span class="req">Город</span><input type="text" id="city" list="cities" placeholder="Екатеринбург" autocomplete="off" data-req="Город"><datalist id="cities"></datalist></label>
+        <label class="f ac"><span class="req">Город</span><input type="text" id="city" placeholder="начните вводить название" autocomplete="off" autocapitalize="words" spellcheck="false" data-req="Город"><div class="ac-list" id="city-list" hidden></div></label>
       </div>
       <label class="f"><span class="req">Тип</span></label>
       <div class="opts two" id="type" style="margin-bottom:0">
@@ -288,6 +294,38 @@ const fmt0 = x => Math.round(x).toLocaleString('ru-RU') + ' ₽';
 const parseNum = s => { const t = String(s ?? '').replace(/\s|₽/g, '').replace(',', '.'); const n = Number(t.replace('%', '')); if (!isFinite(n)) return 0; return t.indexOf('%') >= 0 ? n / 100 : n; };
 const TYPE_BG = { 'Концерт': '#d9ead3', 'Корпоратив': '#fce5cd', 'Фест': '#c9daf8', 'Тур': '#f7caac', 'Реклама': '#fff2cc' };
 const MONEY = ['gost', 'bryl', 'extra', 'sold'];
+
+// ---------- города для подсказок ----------
+const CITIES_RU = ['Москва','Санкт-Петербург','Новосибирск','Екатеринбург','Казань','Нижний Новгород','Красноярск','Челябинск','Самара','Уфа','Ростов-на-Дону','Краснодар','Омск','Воронеж','Пермь','Волгоград','Саратов','Тюмень','Тольятти','Барнаул','Махачкала','Ижевск','Хабаровск','Ульяновск','Иркутск','Владивосток','Ярославль','Кемерово','Томск','Набережные Челны','Ставрополь','Оренбург','Новокузнецк','Балашиха','Рязань','Севастополь','Пенза','Чебоксары','Липецк','Калининград','Астрахань','Тула','Киров','Сочи','Курск','Улан-Удэ','Сургут','Тверь','Магнитогорск','Якутск','Брянск','Иваново','Владимир','Чита','Белгород','Нижний Тагил','Симферополь','Архангельск','Калуга','Волжский','Смоленск','Саранск','Череповец','Курган','Вологда','Орёл','Владикавказ','Подольск','Грозный','Мурманск','Тамбов','Петрозаводск','Стерлитамак','Нижневартовск','Кострома','Новороссийск','Йошкар-Ола','Химки','Таганрог','Комсомольск-на-Амуре','Сыктывкар','Нальчик','Нижнекамск','Шахты','Дзержинск','Орск','Братск','Благовещенск','Энгельс','Ангарск','Королёв','Великий Новгород','Старый Оскол','Мытищи','Псков','Люберцы','Бийск','Южно-Сахалинск','Армавир','Прокопьевск','Балаково','Абакан','Норильск','Рыбинск','Северодвинск','Петропавловск-Камчатский','Красногорск','Уссурийск','Волгодонск','Новочеркасск','Каменск-Уральский','Златоуст','Электросталь','Альметьевск','Салават','Миасс','Керчь','Находка','Копейск','Пятигорск','Рубцовск','Березники','Коломна','Майкоп','Одинцово','Хасавюрт','Ковров','Кисловодск','Нефтеюганск','Нефтекамск','Новочебоксарск','Серпухов','Щёлково','Домодедово','Первоуральск','Черкесск','Дербент','Орехово-Зуево','Невинномысск','Назрань','Димитровград','Кызыл','Обнинск','Новый Уренгой','Ессентуки','Каспийск','Октябрьский','Раменское','Долгопрудный','Камышин','Муром','Новомосковск','Жуковский','Северск','Ноябрьск','Евпатория','Артём','Пушкино','Арзамас','Ачинск','Бердск','Элиста','Ногинск','Елец','Сергиев Посад','Новошахтинск','Железногорск','Зеленодольск','Тобольск','Междуреченск','Сарапул','Ленинск-Кузнецкий','Воткинск','Ухта','Соликамск','Глазов','Магадан','Великие Луки','Мичуринск','Канск','Киселёвск','Новотроицк','Бузулук','Ялта','Каменск-Шахтинский','Губкин','Бугульма','Ейск','Реутов','Кинешма','Чайковский','Азов','Ханты-Мансийск','Биробиджан','Нарьян-Мар','Анадырь','Салехард','Горно-Алтайск','Анапа','Геленджик','Туапсе','Феодосия','Выборг','Гатчина','Клин','Дмитров','Егорьевск','Воскресенск','Ступино','Наро-Фоминск','Фрязино','Лобня','Ивантеевка','Дубна','Зеленоград','Тихвин','Кириши','Сосновый Бор','Всеволожск','Колпино','Пушкин','Апатиты','Мончегорск','Кандалакша','Котлас','Великий Устюг','Костомукша','Кондопога','Североморск','Печора','Усинск','Воркута','Корсаков','Холмск'];
+const CITIES_CIS = ['Минск','Гомель','Могилёв','Витебск','Гродно','Брест','Алматы','Астана','Шымкент','Караганда','Актобе','Тараз','Павлодар','Усть-Каменогорск','Семей','Атырау','Костанай','Кызылорда','Уральск','Петропавловск','Актау','Темиртау','Туркестан','Кокшетау','Талдыкорган','Экибастуз','Рудный','Жезказган','Ташкент','Самарканд','Бухара','Фергана','Наманган','Андижан','Нукус','Бишкек','Ош','Душанбе','Худжанд','Баку','Ереван','Тбилиси','Батуми','Кишинёв','Тирасполь','Дубай','Абу-Даби','Стамбул','Анталья','Тель-Авив','Хайфа','Лимасол','Ларнака','Белград','Будапешт','Прага','Варшава','Берлин','Мюнхен','Париж','Лондон','Рига','Вильнюс','Таллин','Хельсинки','Донецк','Луганск','Мариуполь','Мелитополь','Бердянск','Херсон'];
+let CITY_POOL = [...new Set([...CITIES_RU, ...CITIES_CIS])];
+function setupCityAC() {
+  const inp = $('city'), list = $('city-list'); let items = [], idx = -1;
+  const norm = x => x.toLowerCase().replace(/ё/g, 'е');
+  const hide = () => { list.hidden = true; idx = -1; };
+  const show = () => {
+    const q = norm(inp.value.trim()); if (q.length < 1) { hide(); return; }
+    const starts = CITY_POOL.filter(c => norm(c).startsWith(q));
+    const inside = CITY_POOL.filter(c => !norm(c).startsWith(q) && norm(c).includes(q));
+    items = [...starts, ...inside].slice(0, 8);
+    if (!items.length || (items.length === 1 && norm(items[0]) === q)) { hide(); return; }
+    list.innerHTML = items.map((c, i) => { const p = norm(c).indexOf(q); const hl = p >= 0 ? c.slice(0, p) + '<b>' + c.slice(p, p + q.length) + '</b>' + c.slice(p + q.length) : c; return `<div data-i="${i}" class="${i === idx ? 'on' : ''}">${hl}</div>`; }).join('');
+    list.hidden = false;
+  };
+  const pick = i => { if (i < 0 || i >= items.length) return; inp.value = items[i]; hide(); inp.dispatchEvent(new Event('input')); };
+  inp.addEventListener('input', () => { idx = -1; show(); });
+  inp.addEventListener('focus', show);
+  inp.addEventListener('blur', () => setTimeout(hide, 150));
+  inp.addEventListener('keydown', e => {
+    if (list.hidden) return;
+    if (e.key === 'ArrowDown') { e.preventDefault(); idx = Math.min(idx + 1, items.length - 1); show(); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); idx = Math.max(idx - 1, 0); show(); }
+    else if (e.key === 'Enter') { e.preventDefault(); pick(idx >= 0 ? idx : 0); }
+    else if (e.key === 'Escape') hide();
+  });
+  list.addEventListener('mousedown', e => { const d = e.target.closest('div[data-i]'); if (d) { e.preventDefault(); pick(+d.dataset.i); } });
+}
+setupCityAC();
 
 // ---------- доступ ----------
 let KEY = '';
@@ -441,7 +479,7 @@ async function api(method, payload) {
 }
 let lastSaved = null;
 function fillRefs(refs) {
-  $('cities').innerHTML = refs.cities.map(c => `<option value="${c.replace(/"/g, '&quot;')}">`).join('');
+  CITY_POOL = [...new Set([...refs.cities, ...CITY_POOL])];
   $('sheet-link').href = refs.sheetUrl;
   const isNew = r => lastSaved && r.date === lastSaved.date && r.city === lastSaved.city && Math.abs(r.sum - lastSaved.sum) < 0.01;
   $('recent').innerHTML = refs.recent.length ? refs.recent.map(r => `<tr class="${isNew(r) ? 'new' : ''}"><td>${r.date}${isNew(r) ? '<span class="badge">новая</span>' : ''}</td><td>${r.city}</td><td>${r.cp}</td><td class="r"><b>${fmt0(r.sum)}</b></td><td><span class="t" style="background:${TYPE_BG[r.type] || 'var(--line)'};color:#0b0b0d">${r.type || ''}</span></td></tr>`).join('') : '<tr><td colspan="5" class="hint">пусто</td></tr>';
