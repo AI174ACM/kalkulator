@@ -1,240 +1,281 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ru">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="robots" content="noindex,nofollow,noarchive">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Калькулятор концерта</title>
+<meta name="robots" content="noindex,nofollow,noarchive">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geologica:wght@400;500;600;700&family=Golos+Text:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;900&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-:root{
-  color-scheme:light;
-  --bg:#F2F4F3; --surface:#FFFFFF; --surface-2:#E9ECEB; --surface-3:#DFE4E2;
-  --ink:#131A1E; --ink-2:#4E5A60; --ink-3:#7F8B91; --line:#DDE2E1; --line-2:#EEF1F0;
-  --accent:#1C5CAB; --accent-soft:#E3ECF8;
-  --s1:#2a78d6; --s2:#eb6834; --s3:#1baf7a; --s4:#eda100; --sx:#8B949A;
-  --good:#0ca30c; --good-text:#006300; --warn:#fab219; --crit:#d03b3b;
-  --yellow:#FFF2CC; --green:#D9EAD3;
-  --shadow:0 1px 2px rgba(19,26,30,.05),0 8px 24px -12px rgba(19,26,30,.12);
-  --radius:14px;
-}
-@media (prefers-color-scheme: dark){
-  :root:not([data-theme="light"]){
-    color-scheme:dark;
-    --bg:#0F1214; --surface:#181C1F; --surface-2:#22282C; --surface-3:#2C3338;
-    --ink:#F2F4F3; --ink-2:#B9C2C7; --ink-3:#7F8B91; --line:#2A3135; --line-2:#222A2E;
-    --accent:#5598e7; --accent-soft:#1B2A3E;
-    --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#c98500; --sx:#6F7A80;
-    --good:#0ca30c; --good-text:#2ec22e; --warn:#fab219; --crit:#e05a5a;
-    --yellow:#3a3520; --green:#1f3324;
-    --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px -12px rgba(0,0,0,.6);
+  :root{
+    --bg:#0b0b0d; --bg2:#121216; --card:#16161b; --line:#26262e; --line2:#34343e;
+    --text:#f3f1ea; --muted:#8f8f9c; --soft:#d9d7cf; --accent:#ffd60a; --accent2:#ffb800; --accent-text:#0b0b0d;
+    --err:#ff5c5c; --ok:#3ddc84; --field:#0f0f13;
+    --display:'Unbounded', 'Manrope', Arial, sans-serif;
+    --body:'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
   }
-}
-*{box-sizing:border-box}
-[hidden]{display:none!important}
-html,body{min-height:100%}
-body{margin:0;background:var(--bg);color:var(--ink);font-family:"Golos Text",system-ui,-apple-system,"Segoe UI",sans-serif;font-size:14px;line-height:1.45;-webkit-font-smoothing:antialiased}
-h1,h2,h3{font-family:Geologica,"Golos Text",system-ui,sans-serif;margin:0;font-weight:600}
-a{color:var(--accent)}
-button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
-button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-.mono{font-family:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px}
-.num{font-variant-numeric:tabular-nums}
-.muted{color:var(--ink-3)}
-.sub{color:var(--ink-2)}
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth;color-scheme:dark}
+  body{margin:0;background:var(--bg);color:var(--text);font:16px/1.5 var(--body);-webkit-font-smoothing:antialiased;
+    background-image:radial-gradient(900px 400px at 50% -80px, rgba(255,214,10,.14), transparent 70%)}
+  .wrap{max-width:760px;margin:0 auto;padding:36px 18px 80px}
+  [hidden]{display:none!important}
+  .ad .not-ad{display:none!important}
+  .ad-only{display:none!important}
+  .ad .ad-only{display:block!important}
+  .ad #row-hands{grid-template-columns:1fr}
 
-.top{position:sticky;top:0;z-index:5;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
-.top-in{max-width:1180px;margin:0 auto;padding:14px 28px;display:flex;align-items:center;gap:20px;flex-wrap:wrap}
-.brand{display:flex;align-items:center;gap:12px}
-.brand-mark{width:34px;height:34px;border-radius:10px;background:var(--ink);color:var(--bg);display:grid;place-items:center;font-family:Geologica,sans-serif;font-weight:700;font-size:13px}
-.brand h1{font-size:17px;line-height:1.1}
-.brand .sub{font-size:12px;margin-top:2px}
-.spacer{flex:1}
-.stamp{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--ink-2)}
-.dot{width:8px;height:8px;border-radius:50%;background:var(--good);box-shadow:0 0 0 3px color-mix(in srgb,var(--good) 20%,transparent)}
-.dot.bad{background:var(--crit);box-shadow:0 0 0 3px color-mix(in srgb,var(--crit) 20%,transparent)}
-.dot.wait{background:var(--warn);box-shadow:0 0 0 3px color-mix(in srgb,var(--warn) 25%,transparent)}
+  /* ---------- шапка ---------- */
+  .hero{text-align:center;margin-bottom:34px}
+  .logos{display:flex;justify-content:center;align-items:center;gap:22px;margin-bottom:26px}
+  .logo .word{display:inline-block;font:900 22px/1 var(--display);letter-spacing:.06em;padding:14px 18px;border:2px solid var(--text);border-radius:6px}
+  .logo .word.tgk{border-color:var(--accent);color:var(--accent)}
+  .x{font:700 18px/1 var(--display);color:var(--muted)}
+  .kicker{font:700 12px/1 var(--display);letter-spacing:.22em;text-transform:uppercase;color:var(--accent);margin-bottom:14px}
+  h1{font:900 clamp(26px,5.6vw,40px)/1.08 var(--display);margin:0 0 14px;letter-spacing:-.01em}
+  .lead{color:var(--muted);margin:0 auto;max-width:560px;font-size:16px}
+  .stamp{display:inline-flex;align-items:center;gap:8px;margin-top:18px;padding:7px 14px;border:1px solid var(--line);border-radius:999px;font-size:13px;color:var(--muted);background:rgba(255,255,255,.02)}
+  .stamp i{width:8px;height:8px;border-radius:50%;background:var(--accent2);box-shadow:0 0 0 3px rgba(255,184,0,.18)}
+  .stamp.ok i{background:var(--ok);box-shadow:0 0 0 3px rgba(61,220,132,.18)}
+  .stamp.bad i{background:var(--err);box-shadow:0 0 0 3px rgba(255,92,92,.18)}
 
-main{max-width:1180px;margin:0 auto;padding:28px 28px 64px;display:grid;grid-template-columns:minmax(0,7fr) minmax(300px,5fr);gap:24px;align-items:start}
-.col{display:flex;flex-direction:column;gap:18px;min-width:0}
-.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:20px 22px;display:flex;flex-direction:column;gap:14px;min-width:0;box-shadow:var(--shadow)}
-.card-h{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap}
-.card-h h2{font-size:16px}
-.card-h .step{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);font-weight:600}
-.hint{font-size:12.5px;color:var(--ink-2)}
+  /* ---------- карточки ---------- */
+  .card{background:linear-gradient(180deg,var(--card),var(--bg2));border:1px solid var(--line);border-radius:20px;padding:26px 24px;margin-bottom:18px;
+    box-shadow:0 20px 50px rgba(0,0,0,.35)}
+  @media (max-width:520px){.card{padding:22px 16px;border-radius:16px}.card h2 .tip{display:none}}
+  .card h2{display:flex;align-items:center;gap:14px;font:700 17px/1.2 var(--display);margin:0 0 20px;letter-spacing:.01em}
+  .card h2 .n{flex:none;width:34px;height:34px;border-radius:10px;background:var(--accent);color:var(--accent-text);display:grid;place-items:center;font:900 15px/1 var(--display)}
+  .card h2 .tip{margin-left:auto;font:500 13px/1.3 var(--body);color:var(--muted);text-align:right}
 
-.fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 16px}
-.field{display:flex;flex-direction:column;gap:5px;min-width:0}
-.field.wide{grid-column:1/-1}
-.field label{font-size:12px;color:var(--ink-2);font-weight:500}
-.field .in{position:relative}
-.field input{width:100%;font:inherit;color:var(--ink);background:var(--yellow);border:1px solid var(--line);border-radius:10px;padding:10px 12px;transition:border-color .15s,box-shadow .15s}
-.field input:hover{border-color:var(--ink-3)}
-.field input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);outline:none}
-.field input.calc{background:var(--green);color:var(--ink-2)}
-.field input.plain{background:var(--surface)}
-.field input.money{text-align:right;font-variant-numeric:tabular-nums;padding-right:30px}
-.field .unit{position:absolute;right:11px;top:50%;transform:translateY(-50%);font-size:12px;color:var(--ink-3);pointer-events:none}
-.field .note{font-size:11.5px;color:var(--ink-3)}
-.legend{display:flex;gap:14px;font-size:12px;color:var(--ink-2);flex-wrap:wrap}
-.legend i{display:inline-block;width:12px;height:12px;border-radius:3px;border:1px solid var(--line);vertical-align:-2px;margin-right:5px}
+  label.f{display:flex;flex-direction:column;margin-bottom:16px}
+  label.f>span{display:block;font-weight:600;margin-bottom:7px;font-size:14px;color:var(--soft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  label.f .note{display:block;margin-top:6px;font-size:12.5px;color:var(--muted);font-weight:500;line-height:1.35}
+  label.f>span small{font-weight:500;color:var(--muted)}
+  .req::after{content:" *";color:var(--accent)}
+  input[type=text],input[type=date]{
+    width:100%;padding:13px 14px;border:1px solid var(--line2);border-radius:12px;background:var(--field);color:var(--text);font:inherit;outline:none;
+    transition:border-color .15s, box-shadow .15s}
+  input::placeholder{color:#5b5b68}
+  input:focus{border-color:var(--accent);box-shadow:0 0 0 4px rgba(255,214,10,.15)}
+  input.bad{border-color:var(--err);box-shadow:0 0 0 4px rgba(255,92,92,.15)}
+  input[readonly]{background:rgba(61,220,132,.07);border-color:rgba(61,220,132,.3);color:var(--soft);cursor:default}
+  input[readonly]:focus{border-color:rgba(61,220,132,.3);box-shadow:none}
+  .money{position:relative}
+  .money input{text-align:right;padding-right:34px;font-variant-numeric:tabular-nums;font-weight:600}
+  .money::after{content:"₽";position:absolute;right:14px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:14px;pointer-events:none}
+  .row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  @media (max-width:520px){.row{grid-template-columns:1fr}}
+  .hint{font-size:13px;color:var(--muted);margin:-6px 0 16px}
+  .hint:last-child{margin-bottom:0}
 
-.seg{display:inline-flex;background:var(--surface-2);border-radius:10px;padding:3px;gap:2px;flex-wrap:wrap}
-.seg button{padding:6px 12px;border-radius:8px;font-weight:500;color:var(--ink-2);white-space:nowrap;transition:background .15s,color .15s}
-.seg button:hover{color:var(--ink);background:var(--surface-3)}
-.seg button[aria-pressed="true"],.seg button[aria-pressed="true"]:hover{background:var(--accent);color:#fff;box-shadow:0 1px 2px rgba(19,26,30,.15)}
+  .opts{display:grid;gap:10px;margin:-8px 0 18px}
+  .opts.two{grid-template-columns:1fr 1fr}
+  @media (max-width:560px){.opts.two{grid-template-columns:1fr}}
+  .opt{position:relative;display:flex;gap:10px;align-items:center;padding:12px 14px;border:1px solid var(--line2);border-radius:14px;cursor:pointer;background:var(--field);transition:border-color .15s, background .15s}
+  .opt:hover{border-color:#4a4a58}
+  .opt:has(input:checked){border-color:var(--accent);background:rgba(255,214,10,.07);box-shadow:inset 0 0 0 1px var(--accent)}
+  .opt input{position:absolute;opacity:0;pointer-events:none}
+  .opt .dot{flex:none;width:18px;height:18px;border-radius:50%;border:2px solid #4a4a58;display:grid;place-items:center}
+  .opt:has(input:checked) .dot{border-color:var(--accent)}
+  .opt:has(input:checked) .dot::after{content:"";width:9px;height:9px;border-radius:50%;background:var(--accent)}
+  .opt b{font-weight:700;font-size:14px}
 
-table{width:100%;border-collapse:collapse;font-size:13px}
-th{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-3);font-weight:600;text-align:left;padding:6px 0;border-bottom:1px solid var(--line)}
-td{padding:8px 0;border-bottom:1px solid var(--line-2);vertical-align:middle}
-td.r,th.r{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
-tr:last-child td{border-bottom:0}
-td .who{display:flex;align-items:center;gap:8px}
-.sw{width:9px;height:9px;border-radius:50%;flex:none}
-td .rate{font-size:11.5px;color:var(--ink-3)}
-td input.rate-in{width:64px;font:inherit;font-size:12px;color:var(--ink-2);background:var(--surface-2);border:1px solid transparent;border-radius:6px;padding:3px 6px;text-align:right}
-td input.rate-in:focus{border-color:var(--accent);background:var(--surface);outline:none}
+  /* ---------- итог ---------- */
+  .price{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;padding:18px 20px;border-radius:16px;background:rgba(255,214,10,.06);border:1px solid rgba(255,214,10,.25);margin-bottom:18px}
+  .price .lbl{font:700 11px/1 var(--display);letter-spacing:.18em;text-transform:uppercase;color:var(--accent);margin-bottom:8px}
+  .price .val{font:900 clamp(28px,6vw,38px)/1 var(--display);color:var(--text);font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+  .price .val.empty{color:var(--muted);font-weight:700}
+  .price .side{text-align:right;font-size:13px;color:var(--muted)}
+  .price .side b{display:block;color:var(--soft);font-weight:600;font-variant-numeric:tabular-nums;font-size:15px}
+  .kv{display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px solid var(--line);font-size:14px;color:var(--soft)}
+  .kv:last-child{border-bottom:0}
+  .kv b{font-weight:600;color:var(--text);font-variant-numeric:tabular-nums;white-space:nowrap}
+  .kv.sub{color:var(--muted);font-size:13px;padding:6px 0 6px 18px}
+  .kv.sub b{color:var(--soft);font-weight:500}
+  .kv.total{font-weight:700;color:var(--text);font-size:15px}
+  .kv.total b{color:var(--accent)}
+  .kv.obor b{color:var(--ok)}
+  .sw{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:9px;vertical-align:1px}
+  .sub-h{font:700 12px/1 var(--display);letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin:22px 0 8px}
+  .extra{background:rgba(61,220,132,.08);border:1px solid rgba(61,220,132,.25);border-radius:12px;padding:12px 14px;font-size:14px;color:var(--soft);margin-top:14px}
+  .extra b{color:var(--ok);font-variant-numeric:tabular-nums}
+  details{border-top:1px solid var(--line);margin-top:18px;padding-top:14px}
+  details summary{cursor:pointer;color:var(--muted);font-size:14px;font-weight:600;list-style:none;display:flex;align-items:center;gap:8px}
+  details summary::before{content:"";width:7px;height:7px;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:rotate(-45deg);transition:transform .15s;margin-left:4px}
+  details[open] summary::before{transform:rotate(45deg)}
+  details summary::-webkit-details-marker{display:none}
+  details .in{padding-top:14px}
+  table{width:100%;border-collapse:collapse;font-size:13.5px}
+  th{font:700 11px/1.2 var(--display);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);text-align:left;padding:6px 0;border-bottom:1px solid var(--line2)}
+  td{padding:9px 0;border-bottom:1px solid var(--line);vertical-align:middle;color:var(--soft)}
+  td.r,th.r{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+  tr:last-child td{border-bottom:0}
+  td b{color:var(--text);font-weight:600}
+  td input.rate-in{width:64px;font:inherit;font-size:13px;color:var(--soft);background:var(--field);border:1px solid var(--line2);border-radius:8px;padding:5px 8px;text-align:right}
+  td input.rate-in:focus{border-color:var(--accent);outline:none}
+  .t{font-size:11px;padding:2px 8px;border-radius:6px;background:var(--line);color:var(--soft);white-space:nowrap}
 
-.result{position:sticky;top:78px}
-.price{background:var(--ink);color:var(--bg);border-radius:var(--radius);padding:20px 22px;display:flex;flex-direction:column;gap:12px}
-.price .lbl{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:color-mix(in srgb,var(--bg) 60%,transparent);font-weight:600}
-.price .val{font-family:Geologica,sans-serif;font-size:34px;font-weight:600;letter-spacing:-.01em;line-height:1.1;font-variant-numeric:tabular-nums}
-.price .pill.ok{background:rgba(12,163,12,.25);color:#9be89b}
-.price .pill.bad{background:rgba(208,59,59,.3);color:#ffb3b3}
-.price .row{display:flex;justify-content:space-between;gap:12px;font-size:13px;color:color-mix(in srgb,var(--bg) 78%,transparent)}
-.price .row b{color:var(--bg);font-weight:500;font-variant-numeric:tabular-nums}
-.price hr{border:0;border-top:1px solid color-mix(in srgb,var(--bg) 18%,transparent);margin:2px 0}
-.kv{display:flex;justify-content:space-between;gap:12px;padding:7px 0;border-bottom:1px solid var(--line-2);font-size:13px}
-.kv:last-child{border-bottom:0}
-.kv b{font-weight:500;font-variant-numeric:tabular-nums;white-space:nowrap}
-.kv.total{font-weight:600}
-.kv.total b{font-weight:600}
-.pill{display:inline-flex;align-items:center;gap:6px;font-size:12px;padding:3px 9px;border-radius:999px;background:var(--surface-2);color:var(--ink-2)}
-.pill.ok{background:color-mix(in srgb,var(--good) 14%,transparent);color:var(--good-text)}
-.pill.bad{background:color-mix(in srgb,var(--crit) 14%,transparent);color:var(--crit)}
-.extra{background:var(--accent-soft);border-radius:10px;padding:10px 12px;font-size:13px;display:flex;flex-direction:column;gap:4px}
-.extra b{font-variant-numeric:tabular-nums}
+  /* ---------- кнопки ---------- */
+  a{color:var(--accent)}
+  button{font:inherit;cursor:pointer}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:17px 24px;border-radius:14px;border:0;font:700 15px/1 var(--display);letter-spacing:.02em;text-decoration:none;transition:transform .1s, filter .15s}
+  .btn-main{background:linear-gradient(180deg,var(--accent),var(--accent2));color:var(--accent-text);width:100%;box-shadow:0 10px 30px rgba(255,214,10,.25)}
+  .btn-main:hover{filter:brightness(1.05)} .btn-main:active{transform:translateY(1px)}
+  .btn-main:disabled{opacity:.6;cursor:wait}
+  .btn-alt{background:transparent;color:var(--text);border:1px solid var(--line2);width:100%;font-family:var(--body);font-weight:600}
+  .btn-alt:hover{border-color:#4a4a58}
+  .actions{display:grid;grid-template-columns:1fr 1.6fr;gap:12px;margin-top:6px}
+  @media (max-width:560px){.actions{grid-template-columns:1fr}.actions .btn-alt{order:2}}
+  .err{color:var(--err);font-size:14px;margin-top:12px;display:none;text-align:center}
+  .err.show{display:block}
 
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:11px 18px;border-radius:10px;font-weight:600;background:var(--accent);color:#fff;transition:filter .15s,transform .05s;width:100%}
-.btn:hover{filter:brightness(1.08)}
-.btn:active{transform:translateY(1px)}
-.btn[disabled]{opacity:.55;cursor:not-allowed;filter:none}
-.btn.ghost{background:var(--surface-2);color:var(--ink);width:auto;padding:8px 14px;font-weight:500}
-.btn.ghost:hover{background:var(--surface-3)}
-.status{font-size:13px;min-height:1.4em}
-.status.ok{color:var(--good-text)}
-.status.bad{color:var(--crit)}
-.recent td{font-size:12.5px}
-.recent .t{font-size:11px;padding:2px 7px;border-radius:6px;background:var(--surface-2);color:var(--ink-2);white-space:nowrap}
+  /* ---------- готово ---------- */
+  .done{text-align:center;padding:44px 20px}
+  .done .ok{width:72px;height:72px;margin:0 auto 16px;border-radius:50%;background:rgba(61,220,132,.12);color:var(--ok);display:grid;place-items:center;font-size:34px}
+  .done h2{font:700 24px/1.2 var(--display);margin:8px 0 8px;justify-content:center}
+  .done p{color:var(--muted);margin:0 0 22px}
+  .done .actions{grid-template-columns:1fr 1fr;max-width:460px;margin:0 auto}
 
-.gate{max-width:420px;margin:12vh auto;padding:0 20px;display:flex;flex-direction:column;gap:14px}
-.gate .card{gap:12px}
-.gate input{width:100%;font:inherit;padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--ink)}
-.gate .btn{width:auto}
-.foot{grid-column:1/-1;font-size:12px;color:var(--ink-3);display:flex;gap:14px;flex-wrap:wrap;padding-top:8px}
-.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);opacity:0;background:var(--ink);color:var(--bg);padding:12px 18px;border-radius:12px;font-size:13px;box-shadow:var(--shadow);transition:opacity .2s,transform .2s;pointer-events:none;max-width:calc(100% - 32px)}
-.toast.show{opacity:1;transform:translateX(-50%) translateY(0);pointer-events:auto}
-.toast a{color:#9cc4ff}
+  /* ---------- подтверждение ---------- */
+  .veil{position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(4px);display:grid;place-items:center;padding:18px;z-index:10}
+  .veil .card{width:100%;max-width:460px;margin:0}
+  .veil .kv{font-size:14px}
+  .veil .actions{margin-top:20px;grid-template-columns:1fr 1fr}
 
-@media (max-width:900px){main{grid-template-columns:1fr;padding:16px 12px 40px;gap:16px}.result{position:static}.fields{grid-template-columns:1fr}.top-in{padding:10px 12px;gap:10px}.card{padding:16px}.price .val{font-size:30px}}
+  /* ---------- доступ ---------- */
+  .gate{max-width:440px;margin:10vh auto 0}
+  .foot{color:var(--muted);font-size:13px;text-align:center;margin-top:26px}
 </style>
 </head>
 <body>
+<div class="wrap">
+  <header class="hero">
+    <div class="logos">
+      <div class="logo"><span class="word">АК-47</span></div>
+      <span class="x">×</span>
+      <div class="logo"><span class="word tgk">TGK</span></div>
+    </div>
+    <div class="kicker">ИП Гостюхин · внутренний инструмент</div>
+    <h1>Калькулятор концерта</h1>
+    <p class="lead">Расчёт для менеджера: сколько объявить заказчику. Кнопка внизу добавит строку в лист «Концерты_корпоративы 2026»; площадка и реквизиты заказчика подтянутся позже из заявки.</p>
+    <div id="stamp" class="stamp" hidden><i></i><span id="stamp-t">связь с таблицей…</span></div>
+  </header>
 
-<div id="gate" class="gate" hidden>
-  <div class="brand"><div class="brand-mark">АК</div><div><h1>Калькулятор концерта</h1><div class="sub">ИП Гостюхин</div></div></div>
-  <div class="card">
-    <h2 style="font-size:16px">Доступа нет</h2>
-    <div class="hint">Страница открывается только по личной ссылке. Если ссылка есть, откройте её заново, или введите ключ из ссылки.</div>
-    <input id="gate-key" placeholder="Ключ доступа" autocomplete="off" spellcheck="false">
-    <div><button class="btn" id="gate-go">Войти</button></div>
-    <div id="gate-msg" class="status bad"></div>
-  </div>
+  <!-- доступа нет -->
+  <section id="gate" class="card gate" hidden>
+    <h2><span class="n">!</span>Доступа нет</h2>
+    <p class="hint" style="margin-top:0">Страница открывается только по личной ссылке. Если ссылка есть — откройте её заново или введите ключ из неё.</p>
+    <label class="f"><span>Ключ доступа</span><input type="text" id="gate-key" autocomplete="off" spellcheck="false" placeholder="ключ из ссылки"></label>
+    <button class="btn btn-main" id="gate-go" type="button">Войти</button>
+    <div class="err" id="gate-msg"></div>
+  </section>
+
+  <!-- калькулятор -->
+  <form id="app" novalidate hidden>
+    <section class="card">
+      <h2><span class="n">1</span>О концерте<span class="tip">поля со звёздочкой обязательны</span></h2>
+      <div class="row">
+        <label class="f"><span class="req">Дата концерта</span><input type="date" id="date" data-req="Дата концерта"></label>
+        <label class="f"><span class="req">Город</span><input type="text" id="city" list="cities" placeholder="Екатеринбург" autocomplete="off" data-req="Город"><datalist id="cities"></datalist></label>
+      </div>
+      <label class="f"><span class="req">Тип</span></label>
+      <div class="opts two" id="type" style="margin-bottom:0">
+        <label class="opt"><input type="radio" name="type" value="Концерт" checked><span class="dot"></span><b>Концерт</b></label>
+        <label class="opt"><input type="radio" name="type" value="Реклама"><span class="dot"></span><b>Реклама</b></label>
+      </div>
+      <p class="hint" style="margin:0">Площадку и реквизиты заказчик укажет в заявке — отсюда они в таблицу не идут.</p>
+    </section>
+
+    <section class="card">
+      <h2><span class="n">2</span>Кто получает и сколько на руки<span class="tip">0 = нет</span></h2>
+      <div class="row" id="row-hands">
+        <label class="f"><span class="req">Гостюхин, на руки</span><span class="money"><input type="text" id="gost" inputmode="decimal" placeholder="0" data-req="Гостюхин на руки" data-money></span><small class="note">Витя АК, остаётся на ИП</small></label>
+        <label class="f not-ad"><span class="req">Брылин, на руки</span><span class="money"><input type="text" id="bryl" inputmode="decimal" value="100 000" data-req="Брылин на руки" data-money></span><small class="note">Макс АК · обычно 100 000, к перечислению ÷ 0,93</small></label>
+      </div>
+      <div class="row">
+        <label class="f"><span>Петрушенко, на руки</span><span class="money"><input type="text" id="petr" readonly tabindex="-1" value="0"></span><small class="note not-ad">считается сам: 10 % от чистой, к перечислению + его УСН и НДС</small><small class="note ad-only">считается сам: 10 % от Гостюхина, к перечислению + его УСН и НДС</small></label>
+        <label class="f"><span class="req">Доп. расходы</span><span class="money"><input type="text" id="extra" inputmode="decimal" value="0" data-req="Доп. расходы" data-money></span><small class="note">по безналу, 0 = нет · войдут в цену и лягут в оборотку</small></label>
+      </div>
+      <p class="hint ad-only" style="margin:4px 0 0">Реклама: Брылина нет, Петрушенко 10 % от Гостюхина на руки, админ 3 % от Гостюхина и Петрушенко на руки (÷ 0,93), сверху УСН 6 % и НДС 5 %, округление вверх до 1 000.</p>
+    </section>
+
+    <section class="card">
+      <h2><span class="n">3</span>Итог</h2>
+      <div class="price">
+        <div><div class="lbl">Цена для договора</div><div class="val" id="p-contract">—</div><div class="hint" style="margin:8px 0 0" id="p-note">вверх до 1 000</div></div>
+        <div class="side">все выплаты по концерту<b id="p-payouts">—</b></div>
+      </div>
+      <label class="f"><span>Цена по договору, если хочешь круглее</span><span class="money"><input type="text" id="sold" inputmode="decimal" value="" placeholder="как расчётная" data-money></span><small class="note">Расчётная цена <b id="p-min">—</b>. Можно поставить больше, например круглую сумму: разница целиком уйдёт в оборотку, доли Петрушенко и админа не изменятся. Меньше расчётной нельзя.</small></label>
+      <div class="kv"><span>Цена без НДС <small class="hint" style="margin:0">от цены в таблицу</small></span><b id="p-net">—</b></div>
+      <div class="kv sub"><span>в ней УСН 6 %</span><b id="p-usn">—</b></div>
+      <div class="kv"><span>НДС 5 %</span><b id="p-nds">—</b></div>
+      <div class="kv"><span>Итого с НДС до округления</span><b id="p-gross">—</b></div>
+
+      <div class="sub-h">Строка в таблицу</div>
+      <div class="kv total"><span>ИП Гостюхин, приход</span><b id="r-sum">—</b></div>
+      <div class="kv sub"><span>НДС 5 %</span><b id="r-nds">—</b></div>
+      <div class="kv sub"><span>УСН 6 %</span><b id="r-usn">—</b></div>
+      <div class="kv"><span><i class="sw" style="background:#5598e7"></i>Гостюхин на руки</span><b id="r-gost14">—</b></div>
+      <div class="kv obor"><span><i class="sw" style="background:#3ddc84"></i>Оборотка <small class="hint" style="margin:0">доп. расходы, хвост округления, надбавка</small></span><b id="r-obor">—</b></div>
+      <div class="kv not-ad"><span><i class="sw" style="background:#eb6834"></i>ИП Брылин</span><b id="r-bryl">—</b></div>
+      <div class="kv"><span><i class="sw" style="background:#3ddc84"></i>Петрушенко</span><b id="r-petr">—</b></div>
+      <div class="kv"><span><i class="sw" style="background:#ffd60a"></i>Админ (Мельников)</span><b id="r-adm">—</b></div>
+      <p class="hint" style="margin:12px 0 0">В таблице колонка «Гостюхин» = на руки + оборотка: <b id="r-gost" style="color:var(--text)">—</b>.</p>
+
+      <details>
+        <summary>Подробный расчёт и ставки</summary>
+        <div class="in">
+          <table>
+            <thead><tr><th>Участник</th><th class="r">На руки</th><th class="r">Ставка</th><th class="r">К перечислению</th></tr></thead>
+            <tbody id="parts"></tbody>
+          </table>
+          <p class="hint" style="margin:12px 0 0">Как в листе «АК47-ТГК Осень 2026». Брылин и админ: к перечислению ÷ 0,93. Петрушенко: 10 % от чистой (цена минус НДС 5 % и УСН 6 %), к перечислению × 1,05 ÷ 0,94. Админ: 7 % от Гостюхина, Брылина и Петрушенко на руки. Доп. расходы, хвост округления до 1 000 и всё, что накинули сверху в «Цене по договору», уходят в оборотку. Ставки можно поправить в таблице выше — расчёт пересчитается. <span id="p-check"></span></p>
+        </div>
+      </details>
+    </section>
+
+    <div class="actions">
+      <button class="btn btn-alt" id="reset" type="button">Сбросить калькулятор</button>
+      <button class="btn btn-main" id="send" type="submit">Отправить данные в таблицу</button>
+    </div>
+    <div class="err" id="err"></div>
+
+    <details style="border:0;margin-top:26px">
+      <summary>Последние строки в таблице</summary>
+      <div class="in">
+        <table><thead><tr><th>Дата</th><th>Город</th><th>Заказчик</th><th class="r">Сумма</th><th></th></tr></thead><tbody id="recent"><tr><td colspan="5" class="hint">загрузка…</td></tr></tbody></table>
+        <p class="hint" style="margin:12px 0 0"><a id="sheet-link" href="#" target="_blank" rel="noopener">Открыть лист «Концерты_корпоративы 2026» ↗</a></p>
+      </div>
+    </details>
+  </form>
+
+  <!-- готово -->
+  <section class="card done" id="done" hidden>
+    <div class="ok">✔</div>
+    <h2>Строка добавлена</h2>
+    <p id="done-msg"></p>
+    <div class="actions">
+      <a class="btn btn-alt" id="done-open" href="#" target="_blank" rel="noopener">Открыть в таблице</a>
+      <button class="btn btn-main" id="done-new" type="button">Новый расчёт</button>
+    </div>
+  </section>
+
+  <p class="foot" id="foot">Как разносим приход: НДС = сумма × 5/105 → УСН = (сумма − НДС) × 6 % → Брылин ÷ 0,93, Петрушенко 10 % от чистой, админ 7 % ÷ 0,93 → Гостюхин на руки → остальное (доп. расходы, хвост округления) оборотка.</p>
 </div>
 
-<div id="app" hidden>
-<header class="top"><div class="top-in">
-  <div class="brand"><div class="brand-mark">АК</div><div><h1>Калькулятор концерта</h1><div class="sub">ИП Гостюхин · пишет в лист «Концерты_корпоративы 2026»</div></div></div>
-  <div class="spacer"></div>
-  <div class="stamp"><span id="dot" class="dot wait"></span><span id="stamp">связь с таблицей…</span></div>
-</div></header>
-
-<main>
-  <div class="col">
-    <div class="card">
-      <div class="card-h"><div><div class="step">Шаг 1</div><h2>О концерте</h2></div>
-        <div class="legend"><span><i style="background:var(--yellow)"></i>заполняем</span><span><i style="background:var(--green)"></i>считается само</span></div></div>
-      <div class="fields">
-        <div class="field"><label for="date">Дата концерта</label><div class="in"><input id="date" type="date"></div></div>
-        <div class="field"><label>Тип</label><div class="seg" id="type" role="group" aria-label="Тип"></div></div>
-        <div class="field"><label for="city">Город</label><div class="in"><input id="city" list="cities" placeholder="Киров" autocomplete="off"></div><datalist id="cities"></datalist></div>
-        <div class="field"><label for="venue">Площадка мероприятия</label><div class="in"><input id="venue" placeholder="Gaudi" autocomplete="off"></div></div>
-        <div class="field wide"><label for="cp">Заказчик (контрагент)</label><div class="in"><input id="cp" list="cps" placeholder="ИП Баранов (дог. №11-2026)" autocomplete="off"></div><datalist id="cps"></datalist></div>
-        <div class="field"><label for="mgr">Менеджеру за продажу, на руки</label><div class="in"><input id="mgr" class="money" inputmode="decimal" value="0"><span class="unit">₽</span></div><span class="note">0 = нет</span></div>
-        <div class="field"><label for="extra">Доп. расходы по безналу</label><div class="in"><input id="extra" class="money" inputmode="decimal" value="0"><span class="unit">₽</span></div><span class="note">0 = нет</span></div>
-        <div class="field wide"><label for="sold">Цена продажи, если согласована</label><div class="in"><input id="sold" class="money" inputmode="decimal" value="0"><span class="unit">₽</span></div><span class="note">0 = нет. Если указана, в таблицу встанет она, а не расчётная цена.</span></div>
-      </div>
+<!-- подтверждение -->
+<div class="veil" id="veil" hidden>
+  <section class="card">
+    <h2><span class="n">?</span>Отправить в таблицу?</h2>
+    <div id="cf-body"></div>
+    <div class="actions">
+      <button class="btn btn-alt" id="cf-no" type="button">Отмена</button>
+      <button class="btn btn-main" id="cf-yes" type="button">Отправить</button>
     </div>
-
-    <div class="card">
-      <div class="card-h"><div><div class="step">Шаг 2</div><h2>Кто получает и сколько на руки</h2></div><span class="hint">0 = нет</span></div>
-      <div class="fields">
-        <div class="field"><label for="gost">Гостюхин (Витя АК), остаётся на ИП</label><div class="in"><input id="gost" class="money" inputmode="decimal" value="600000"><span class="unit">₽</span></div></div>
-        <div class="field"><label for="bryl">ИП Брылин (Макс АК), на руки</label><div class="in"><input id="bryl" class="money" inputmode="decimal" value="100000"><span class="unit">₽</span></div></div>
-      </div>
-      <table>
-        <thead><tr><th>Участник</th><th class="r">На руки</th><th class="r">Ставка</th><th class="r">К перечислению</th></tr></thead>
-        <tbody id="parts"></tbody>
-      </table>
-      <div class="hint">Петрушенко: 10 % от всех выплат, ÷ 0,94 × 1,05. Админ: 7 % от Гостюхина, Брылина и Петрушенко, ÷ ставку Брылина. Ставки можно поправить прямо в таблице.</div>
-    </div>
-
-    <div class="card recent">
-      <div class="card-h"><h2>Последние строки в таблице</h2><a id="sheet-link" href="#" target="_blank" rel="noopener">открыть лист ↗</a></div>
-      <table><thead><tr><th>Дата</th><th>Город</th><th>Заказчик</th><th class="r">Сумма</th><th></th></tr></thead><tbody id="recent"><tr><td colspan="5" class="muted">загрузка…</td></tr></tbody></table>
-    </div>
-  </div>
-
-  <div class="col result">
-    <div class="price">
-      <div class="lbl">Цена для договора</div>
-      <div class="val num" id="p-contract">—</div>
-      <div class="row"><span>Все выплаты по концерту</span><b id="p-payouts">—</b></div>
-      <div class="row"><span>УСН 6 % (внутри цены)</span><b id="p-usn">—</b></div>
-      <div class="row"><span>Цена без НДС</span><b id="p-net">—</b></div>
-      <div class="row"><span>НДС 5 %</span><b id="p-nds">—</b></div>
-      <div class="row"><span>Итого с НДС</span><b id="p-gross">—</b></div>
-      <hr>
-      <div class="row"><span>Округлено вверх до 1 000</span><span id="p-check" class="pill ok">проверка 0</span></div>
-    </div>
-
-    <div class="card">
-      <div class="card-h"><div><div class="step">Шаг 3</div><h2>Строка в таблицу</h2></div><span id="p-type" class="pill"></span></div>
-      <div id="extra-box" class="extra" hidden>
-        <div>Продали дороже минимальной цены на <b id="x-over">—</b></div>
-        <div>Из них Гостюхину после НДС и УСН: <b id="x-gost">—</b></div>
-      </div>
-      <div>
-        <div class="kv total"><span>ИП Гостюхин (приход)</span><b id="r-sum">—</b></div>
-        <div class="kv"><span class="sub">НДС 5 %</span><b id="r-nds">—</b></div>
-        <div class="kv"><span class="sub">УСН 6 %</span><b id="r-usn">—</b></div>
-        <div class="kv"><span><span class="sw" style="background:var(--s1);display:inline-block;margin-right:7px"></span>Гостюхин (остаток)</span><b id="r-gost">—</b></div>
-        <div class="kv"><span><span class="sw" style="background:var(--s2);display:inline-block;margin-right:7px"></span>ИП Брылин</span><b id="r-bryl">—</b></div>
-        <div class="kv"><span><span class="sw" style="background:var(--sx);display:inline-block;margin-right:7px"></span>Менеджер</span><b id="r-mgr">—</b></div>
-        <div class="kv"><span><span class="sw" style="background:var(--s3);display:inline-block;margin-right:7px"></span>Петрушенко</span><b id="r-petr">—</b></div>
-        <div class="kv"><span><span class="sw" style="background:var(--s4);display:inline-block;margin-right:7px"></span>Админ (Мельников)</span><b id="r-adm">—</b></div>
-        <div class="kv"><span class="sub">Доп. расходы</span><b id="r-extra">—</b></div>
-      </div>
-      <button class="btn" id="save">Записать в таблицу</button>
-      <div id="status" class="status"></div>
-    </div>
-  </div>
-
-  <div class="foot"><span>Как разносим приход: НДС = сумма × 5/105 → УСН = (сумма − НДС) × 6 % → Брылин, менеджер, Петрушенко, админ как в шаге 2 → Гостюхин = остаток.</span><span id="whoami"></span></div>
-</main>
+  </section>
 </div>
-<div id="toast" class="toast"></div>
 
 <script>
 const API_URL = "https://script.google.com/macros/s/AKfycbwiIKyrzrE90wGlI4Vbzr0XGw7_YIjZ60g19D1dFqBEvsEDkxAjGeKQy_VRkVEhN_9spA/exec";
@@ -243,9 +284,9 @@ const $ = id => document.getElementById(id);
 const r2 = x => Math.round((x + Number.EPSILON) * 100) / 100;
 const fmt = x => (Math.round(x * 100) / 100).toLocaleString('ru-RU', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' ₽';
 const fmt0 = x => Math.round(x).toLocaleString('ru-RU') + ' ₽';
-const parseNum = s => { const n = Number(String(s ?? '').replace(/\s|₽/g, '').replace(',', '.')); return isFinite(n) ? n : 0; };
-const TYPES = ['Концерт', 'Корпоратив', 'Фест', 'Тур', 'Реклама'];
+const parseNum = s => { const t = String(s ?? '').replace(/\s|₽/g, '').replace(',', '.'); const n = Number(t.replace('%', '')); if (!isFinite(n)) return 0; return t.indexOf('%') >= 0 ? n / 100 : n; };
 const TYPE_BG = { 'Концерт': '#d9ead3', 'Корпоратив': '#fce5cd', 'Фест': '#c9daf8', 'Тур': '#f7caac', 'Реклама': '#fff2cc' };
+const MONEY = ['gost', 'bryl', 'extra', 'sold'];
 
 // ---------- доступ ----------
 let KEY = '';
@@ -253,106 +294,206 @@ let KEY = '';
   const u = new URL(location.href); const k = u.searchParams.get('k');
   try { if (k) { localStorage.setItem(LS, k); u.searchParams.delete('k'); history.replaceState(null, '', u.pathname + (u.search || '') + u.hash); } KEY = localStorage.getItem(LS) || ''; } catch (e) { KEY = k || ''; }
 })();
-function showGate(msg) { $('app').hidden = true; $('gate').hidden = false; $('gate-msg').textContent = msg || ''; }
+function showGate(msg) { $('app').hidden = true; $('done').hidden = true; $('stamp').hidden = true; $('gate').hidden = false; $('gate-msg').textContent = msg || ''; $('gate-msg').classList.toggle('show', !!msg); }
 $('gate-go').onclick = () => { const k = $('gate-key').value.trim(); if (!k) return; KEY = k; try { localStorage.setItem(LS, k); } catch (e) {} boot(); };
-$('gate-key').addEventListener('keydown', e => { if (e.key === 'Enter') $('gate-go').click(); });
+$('gate-key').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); $('gate-go').click(); } });
 
 // ---------- расчёт (1:1 с листом «Калькулятор_концерт») ----------
-const rates = { bryl: 0.93, mgr: 0.93, petr: 0.10, adm: 0.07 };
+const rates = { bryl: 0.93, petr: 0.10, adm: 0.07 };   // как в листе «АК47-ТГК Осень 2026»: bryl — коэффициент ИП (на руки → к перечислению), petr/adm — проценты
+const USN = 0.06, NDS = 0.05, AD_ADM = 0.03;   // реклама: админ 3 % от прихода
+const isAd = () => curType() === 'Реклама';
+const curType = () => (document.querySelector('input[name=type]:checked') || {}).value || 'Концерт';
 function calc() {
-  const C14 = parseNum($('gost').value), C15 = parseNum($('bryl').value), C8 = parseNum($('mgr').value), C9 = parseNum($('extra').value), C10 = parseNum($('sold').value);
-  const D15 = rates.bryl, D16 = rates.mgr, D18 = rates.petr, D19 = rates.adm;
-  const E14 = C14;
-  const E15 = C15 === 0 ? 0 : r2(C15 / D15);
-  const C16 = C8, E16 = C16 === 0 ? 0 : r2(C16 / D16);
-  const C17 = C9, E17 = C17;
-  const C22 = r2((E14 + E15 + E16 + E17 + D19 * (C14 + C15) / D15) / (1 - D18 * 1.05 / 0.94 - D19 * D18 / D15));
-  const C18 = r2(D18 * C22), E18 = r2(C18 / 0.94 * 1.05);
-  const C19 = r2(D19 * (C14 + C15 + C18)), E19 = r2(C19 / D15);
-  const C24 = r2(C22 / 0.94), C23 = r2(C24 - C22), C25 = r2(C24 * 0.05), C26 = r2(C24 + C25), C27 = Math.ceil(C26 / 1000) * 1000;
-  const C30 = C10 === 0 ? 0 : r2(C10 - C26), C31 = C10 === 0 ? 0 : r2((C10 - C26) / 1.05 * 0.94);
-  const C33 = r2(C22 - (E14 + E15 + E16 + E17 + E18 + E19));
-  // строка в таблицу
-  const sum = C10 > 0 ? C10 : C27;
-  const nds = sum * 5 / 105, usn = (sum - nds) * 0.06;
-  const gostRest = r2(sum - nds - usn - E15 - E16 - E18 - E19 - E17);
-  return { C14, C15, C16, C17, C18, C19, E14, E15, E16, E17, E18, E19, C22, C23, C24, C25, C26, C27, C30, C31, C33, C10, sum, nds: r2(nds), usn: r2(usn), gostRest };
+  if (isAd()) return calcAd();
+  // 1:1 с листом «АК47-ТГК Осень 2026» (калькулятор тура): D3 УСН, D4 НДС, D5 админ, D6 Петрушенко, D7 коэффициент ИП
+  const L = parseNum($('gost').value), B = parseNum($('bryl').value), X = parseNum($('extra').value), S = parseNum($('sold').value);
+  const D3 = USN, D4 = NDS, D5 = rates.adm, D6 = rates.petr, D7 = rates.bryl;
+  const H = B === 0 ? 0 : r2(B / D7);                                   // Брылин к перечислению
+  const denom = 1 - D6 * (1 + D4) / (1 - D3) - D5 * D6 / D7;
+  const Cneed = (L + H + X + D5 * (L + B) / D7) / denom;                // нужная «чистая» (без НДС и УСН)
+  const Draw = r2(Cneed / (1 - D3) * (1 + D4));                         // итого с НДС до округления
+  const C27 = L > 0 ? Math.ceil(Draw / 1000) * 1000 : 0;                // расчётная цена: вверх до 1 000
+  // доли Петрушенко и админа — от чистой расчётной цены (как в листе тура)
+  const E0 = C27 * D4 / (1 + D4), F0 = (C27 - E0) * D3, Cn0 = r2(C27 - E0 - F0);
+  const petrHand = r2(D6 * Cn0), I = r2(petrHand * (1 + D4) / (1 - D3)); // Петрушенко: 10 % от чистой, сверху его УСН и НДС
+  const admHand = r2(D5 * (L + B + petrHand)), J = r2(admHand / D7);    // Админ: 7 % от (Гостюхин + Брылин + Петрушенко на руки), ÷ 0,93
+  // цена по договору: расчётная или круглее (больше) — разница целиком в оборотку
+  const low = S > 0 && S < C27;
+  const sum = S > C27 ? S : C27;
+  const Eraw = sum * D4 / (1 + D4), Fraw = (sum - Eraw) * D3;
+  const E = r2(Eraw), F = r2(Fraw), Cn = r2(sum - Eraw - Fraw);
+  const gostRest = r2(sum - Eraw - Fraw - H - I - J);                   // колонка «Гостюхин» в таблице = на руки + оборотка (доп. расходы внутри)
+  const obor = r2(gostRest - L);                                        // оборотка: доп. расходы, хвост округления и надбавка сверху
+  const C22 = r2(L + H + X + I + J);                                    // все выплаты по концерту
+  const C33 = r2(Cn - (L + H + I + J + obor));                          // служебная проверка (всегда 0): доп. расходы внутри оборотки
+  return { C14: L, C15: B, C17: X, C18: petrHand, C19: admHand, E14: L, E15: H, E16: 0, E17: X, E18: I, E19: J,
+           C22, C23: F, C24: r2(sum - E), C25: E, C26: Draw, C27, C33, C10: S, sum, nds: E, usn: F, gostRest, obor, low };
 }
-let cur = null, curType = 'Концерт';
+function calcAd() {
+  // Реклама: Гостюхин на руки задан. Петрушенко 10 % от Гостюхина (+ его УСН и НДС), админ 3 % от (Гостюхин + Петрушенко на руки) ÷ 0,93,
+  // сверху УСН 6 % и НДС 5 %, цена вверх до 1 000, хвост в оборотку. Брылина нет.
+  const L = parseNum($('gost').value), X = parseNum($('extra').value), S = parseNum($('sold').value);
+  const petrHand = r2(rates.petr * L), I = r2(petrHand * (1 + NDS) / (1 - USN));
+  const admHand = r2(AD_ADM * (L + petrHand)), J = r2(admHand / rates.bryl);
+  const Cneed = L + I + J + X;
+  const Draw = r2(Cneed / (1 - USN) * (1 + NDS));
+  const C27 = L > 0 ? Math.ceil(Draw / 1000) * 1000 : 0;
+  const low = S > 0 && S < C27;
+  const sum = S > C27 ? S : C27;
+  const Eraw = sum * NDS / (1 + NDS), Fraw = (sum - Eraw) * USN;
+  const E = r2(Eraw), F = r2(Fraw), Cn = r2(sum - Eraw - Fraw);
+  const gostRest = r2(sum - Eraw - Fraw - I - J);
+  const obor = r2(gostRest - L);
+  const C22 = r2(L + I + J + X);
+  return { C14: L, C15: 0, C17: X, C18: petrHand, C19: admHand, E14: L, E15: 0, E16: 0, E17: X, E18: I, E19: J,
+           C22, C23: F, C24: r2(sum - E), C25: E, C26: Draw, C27, C33: r2(Cn - (L + I + J + obor)), C10: S, sum, nds: E, usn: F, gostRest, obor, low, ad: true };
+}
+let cur = null;
 function render() {
   const c = cur = calc();
-  $('p-contract').textContent = fmt0(c.C27);
-  $('p-payouts').textContent = fmt(c.C22); $('p-usn').textContent = fmt(c.C23); $('p-net').textContent = fmt(c.C24); $('p-nds').textContent = fmt(c.C25); $('p-gross').textContent = fmt(c.C26);
-  const ok = Math.abs(c.C33) < 0.011; $('p-check').className = 'pill ' + (ok ? 'ok' : 'bad'); $('p-check').textContent = ok ? 'проверка 0' : 'проверка ' + c.C33.toFixed(2);
-  const rows = [
-    ['Гостюхин (Витя АК), остаётся на ИП', 'var(--s1)', c.C14, '', c.E14],
-    ['ИП Брылин (Макс АК)', 'var(--s2)', c.C15, 'bryl', c.E15],
-    ['Менеджер за продажу', 'var(--sx)', c.C16, 'mgr', c.E16],
-    ['Доп. расходы по безналу', 'var(--sy,#c7ced2)', c.C17, '', c.E17],
-    ['Петрушенко, ' + (rates.petr * 100).toLocaleString('ru-RU') + ' % от чистой', 'var(--s3)', c.C18, 'petr', c.E18],
-    ['Админ (Мельников), ' + (rates.adm * 100).toLocaleString('ru-RU') + ' %', 'var(--s4)', c.C19, 'adm', c.E19],
+  const ad = !!c.ad;
+  $('app').classList.toggle('ad', ad);
+  const has = c.C14 > 0;
+  const F = (x) => has ? fmt(x) : '—';
+  $('p-contract').textContent = has ? fmt0(c.sum) : '—'; $('p-contract').className = 'val' + (has ? '' : ' empty');
+  $('p-min').textContent = has ? fmt0(c.C27) : '—';
+  $('p-note').textContent = c.sum > c.C27 ? 'округлил сам, расчётная ' + fmt0(c.C27) : 'расчётная, вверх до 1 000';
+  $('sold').classList.toggle('bad', !!c.low);
+  $('sold').placeholder = has ? fmt0(c.C27).replace(' ₽', '') : 'как расчётная';
+  $('p-payouts').textContent = F(c.C22); $('p-usn').textContent = F(c.C23); $('p-net').textContent = F(c.C24); $('p-nds').textContent = F(c.C25); $('p-gross').textContent = F(c.C26);
+  const ok = Math.abs(c.C33) < 0.011; $('p-check').textContent = has ? (ok ? 'Служебная проверка формул: 0.' : 'Проверка формул: ' + c.C33.toFixed(2) + ' — так быть не должно.') : '';
+  $('p-check').style.color = ok ? '' : 'var(--err)';
+  const rows = ad ? [
+    ['Гостюхин (Витя АК), остаётся на ИП', c.C14, '', c.E14],
+    ['Доп. расходы по безналу', c.C17, '', c.E17],
+    ['Петрушенко, ' + (rates.petr * 100).toLocaleString('ru-RU') + ' % от Гостюхина', c.C18, 'petr', c.E18],
+    ['Админ (Мельников), 3 % от Гостюхина и Петрушенко, ÷ коэффициент', c.C19, '', c.E19],
+  ] : [
+    ['Гостюхин (Витя АК), остаётся на ИП', c.C14, '', c.E14],
+    ['ИП Брылин (Макс АК), к перечислению ÷ коэффициент', c.C15, 'bryl', c.E15],
+    ['Доп. расходы по безналу', c.C17, '', c.E17],
+    ['Петрушенко, ' + (rates.petr * 100).toLocaleString('ru-RU') + ' % от чистой', c.C18, 'petr', c.E18],
+    ['Админ (Мельников), ' + (rates.adm * 100).toLocaleString('ru-RU') + ' % от Гостюхина, Брылина и Петрушенко, ÷ коэффициент', c.C19, 'adm', c.E19],
   ];
-  $('parts').innerHTML = rows.map(([n, col, hand, rk, wire]) => `<tr><td><span class="who"><span class="sw" style="background:${col}"></span>${n}</span></td><td class="r">${fmt(hand)}</td><td class="r">${rk ? `<input class="rate-in num" data-rate="${rk}" value="${String(rates[rk]).replace('.', ',')}">` : '<span class="rate">—</span>'}</td><td class="r"><b>${fmt(wire)}</b></td></tr>`).join('');
-  document.querySelectorAll('.rate-in').forEach(i => i.addEventListener('change', e => { const v = parseNum(e.target.value); if (v > 0 && v <= 1) rates[e.target.dataset.rate] = v; render(); }));
-  $('extra-box').hidden = !(c.C10 > 0); $('x-over').textContent = fmt(c.C30); $('x-gost').textContent = fmt(c.C31);
-  $('r-sum').textContent = fmt(c.sum); $('r-nds').textContent = fmt(c.nds); $('r-usn').textContent = fmt(c.usn); $('r-gost').textContent = fmt(c.gostRest);
-  $('r-bryl').textContent = fmt(c.E15); $('r-mgr').textContent = fmt(c.E16); $('r-petr').textContent = fmt(c.E18); $('r-adm').textContent = fmt(c.E19); $('r-extra').textContent = fmt(c.E17);
-  $('p-type').textContent = curType; $('p-type').style.background = TYPE_BG[curType]; $('p-type').style.color = '#131A1E';
-  $('save').disabled = !(c.sum > 0) || !($('date').value) || !$('city').value.trim() || !$('cp').value.trim();
+  $('parts').innerHTML = rows.map(([n, hand, rk, wire]) => `<tr><td>${n}</td><td class="r">${fmt(hand)}</td><td class="r">${rk ? `<input class="rate-in" data-rate="${rk}" value="${rk === 'bryl' ? String(rates.bryl).replace('.', ',') : (rates[rk] * 100).toLocaleString('ru-RU') + ' %'}">` : '—'}</td><td class="r"><b>${fmt(wire)}</b></td></tr>`).join('');
+  document.querySelectorAll('.rate-in').forEach(i => i.addEventListener('change', e => { const v = parseNum(e.target.value); if (v > 0 && v < 1) rates[e.target.dataset.rate] = v; render(); }));
+  $('r-sum').textContent = F(c.sum); $('r-nds').textContent = F(c.nds); $('r-usn').textContent = F(c.usn); $('r-gost').textContent = F(c.gostRest); $('r-gost14').textContent = F(c.C14); $('r-obor').textContent = F(c.obor);
+  $('petr').value = has ? c.C18.toLocaleString('ru-RU', { maximumFractionDigits: 2 }) : '0';
+  $('r-bryl').textContent = F(c.E15); $('r-petr').textContent = F(c.E18); $('r-adm').textContent = F(c.E19);
 }
-['gost', 'bryl', 'mgr', 'extra', 'sold'].forEach(id => {
+MONEY.forEach(id => {
   const el = $(id);
-  el.addEventListener('input', render);
-  el.addEventListener('focus', () => { el.value = String(parseNum(el.value) || '').replace('.', ','); el.select(); });
-  el.addEventListener('blur', () => { const v = parseNum(el.value); el.value = v.toLocaleString('ru-RU', { maximumFractionDigits: 2 }); render(); });
-  el.dispatchEvent(new Event('blur'));
+  el.addEventListener('input', () => { el.classList.remove('bad'); render(); });
+  el.addEventListener('focus', () => { const v = parseNum(el.value); el.value = v ? String(v).replace('.', ',') : ''; el.select(); });
+  el.addEventListener('blur', () => { if (el.value.trim() === '') { render(); return; } const v = parseNum(el.value); el.value = (id === 'sold' && v === 0) ? '' : v.toLocaleString('ru-RU', { maximumFractionDigits: 2 }); render(); });
 });
-['date', 'city', 'cp', 'venue'].forEach(id => $(id).addEventListener('input', render));
-$('type').innerHTML = TYPES.map(t => `<button type="button" aria-pressed="${t === curType}">${t}</button>`).join('');
-$('type').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; curType = b.textContent; [...$('type').children].forEach(x => x.setAttribute('aria-pressed', x === b)); render(); });
+['date', 'city'].forEach(id => $(id).addEventListener('input', () => { $(id).classList.remove('bad'); hideErr(); }));
+document.querySelectorAll('input[name=type]').forEach(r => r.addEventListener('change', render));
+
+// ---------- проверка заполненности ----------
+function hideErr() { $('err').classList.remove('show'); }
+function validate() {
+  const missing = [];
+  let first = null;
+  const ad = isAd();
+  document.querySelectorAll('#app [data-req]').forEach(el => {
+    if (ad && el.id === 'bryl') { el.classList.remove('bad'); return; }
+    const empty = el.value.trim() === '';
+    el.classList.toggle('bad', empty);
+    if (empty) { missing.push(el.dataset.req); first = first || el; }
+  });
+  const other = [];
+  if (!missing.length && cur && cur.low) { other.push('Цена по договору меньше расчётной ' + fmt0(cur.C27) + '.'); $('sold').classList.add('bad'); first = first || $('sold'); }
+  if (!missing.length && !other.length && !(cur && cur.C14 > 0)) { other.push('Гостюхин на руки должен быть больше нуля.'); $('gost').classList.add('bad'); first = first || $('gost'); }
+  if (missing.length || other.length) {
+    $('err').textContent = [missing.length ? 'Не заполнено: ' + missing.join(', ') + '.' : '', ...other].filter(Boolean).join(' ');
+    $('err').classList.add('show');
+    first.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    setTimeout(() => first.focus({ preventScroll: true }), 300);
+    return false;
+  }
+  hideErr();
+  return true;
+}
+
+// ---------- сброс ----------
+function resetAll(keepDate) {
+  ['city', 'gost'].forEach(id => { $(id).value = ''; $(id).classList.remove('bad'); });
+  $('extra').value = '0'; $('extra').classList.remove('bad'); $('sold').value = ''; $('sold').classList.remove('bad');
+  $('bryl').value = '100 000'; $('bryl').classList.remove('bad');
+  if (!keepDate) $('date').value = new Date().toISOString().slice(0, 10);
+  $('date').classList.remove('bad');
+  document.querySelector('input[name=type][value="Концерт"]').checked = true;
+  Object.assign(rates, { bryl: 0.93, petr: 0.10, adm: 0.07 });
+  hideErr(); render();
+}
+$('reset').onclick = () => { resetAll(); window.scrollTo({ top: 0, behavior: 'smooth' }); };
+$('done-new').onclick = () => { $('done').hidden = true; $('app').hidden = false; resetAll(); window.scrollTo({ top: 0, behavior: 'smooth' }); };
 
 // ---------- связь с таблицей ----------
-function toast(html, ms) { const t = $('toast'); t.innerHTML = html; t.classList.add('show'); clearTimeout(t._t); t._t = setTimeout(() => t.classList.remove('show'), ms || 6000); }
 async function api(method, payload) {
   const opt = method === 'POST' ? { method: 'POST', body: JSON.stringify(payload), headers: { 'Content-Type': 'text/plain;charset=utf-8' }, redirect: 'follow' } : { method: 'GET', redirect: 'follow' };
   const url = method === 'POST' ? API_URL : API_URL + '?k=' + encodeURIComponent(KEY) + '&t=' + Date.now();
   const res = await fetch(url, opt);
   const txt = await res.text();
-  try { return JSON.parse(txt); } catch (e) { throw new Error('Таблица ответила не по-русски: ' + txt.slice(0, 80)); }
+  try { return JSON.parse(txt); } catch (e) { throw new Error('таблица ответила не по-русски: ' + txt.slice(0, 80)); }
 }
 function fillRefs(refs) {
-  $('cps').innerHTML = refs.contractors.map(c => `<option value="${c.replace(/"/g, '&quot;')}">`).join('');
   $('cities').innerHTML = refs.cities.map(c => `<option value="${c.replace(/"/g, '&quot;')}">`).join('');
   $('sheet-link').href = refs.sheetUrl;
-  $('recent').innerHTML = refs.recent.length ? refs.recent.map(r => `<tr><td class="mono">${r.date}</td><td>${r.city}</td><td class="sub">${r.cp}</td><td class="r">${fmt0(r.sum)}</td><td><span class="t" style="background:${TYPE_BG[r.type] || 'var(--surface-2)'};color:#131A1E">${r.type || ''}</span></td></tr>`).join('') : '<tr><td colspan="5" class="muted">пусто</td></tr>';
+  $('recent').innerHTML = refs.recent.length ? refs.recent.map(r => `<tr><td>${r.date}</td><td>${r.city}</td><td>${r.cp}</td><td class="r"><b>${fmt0(r.sum)}</b></td><td><span class="t" style="background:${TYPE_BG[r.type] || 'var(--line)'};color:#0b0b0d">${r.type || ''}</span></td></tr>`).join('') : '<tr><td colspan="5" class="hint">пусто</td></tr>';
 }
+function stamp(cls, text) { const s = $('stamp'); s.hidden = false; s.className = 'stamp ' + cls; $('stamp-t').textContent = text; }
 async function boot() {
   if (!KEY) { showGate(''); return; }
   $('gate').hidden = true; $('app').hidden = false;
-  if (!$('date').value) { const d = new Date(); $('date').value = d.toISOString().slice(0, 10); }
+  if (!$('date').value) $('date').value = new Date().toISOString().slice(0, 10);
   render();
-  if (!API_URL || API_URL.indexOf('http') !== 0) { $('dot').className = 'dot bad'; $('stamp').textContent = 'таблица не подключена'; return; }
+  if (!API_URL || API_URL.indexOf('http') !== 0) { stamp('bad', 'таблица не подключена'); return; }
+  stamp('', 'связь с таблицей…');
   try {
     const d = await api('GET');
     if (!d.ok) { showGate(d.error || 'Доступа нет'); try { localStorage.removeItem(LS); } catch (e) {} return; }
-    fillRefs(d.refs); $('dot').className = 'dot'; $('stamp').textContent = 'таблица на связи';
-    $('whoami').textContent = 'Личная ссылка: ' + ({ admin: 'Мельников', gost: 'Гостюхин', petr: 'Петрушенко' }[d.role] || d.role) + '.';
-  } catch (e) { $('dot').className = 'dot bad'; $('stamp').textContent = 'нет связи с таблицей'; $('status').className = 'status bad'; $('status').textContent = String(e.message || e); }
+    fillRefs(d.refs); stamp('ok', 'таблица на связи');
+    $('foot').textContent += ' Личная ссылка: ' + ({ admin: 'Мельников', gost: 'Гостюхин', petr: 'Петрушенко' }[d.role] || d.role) + '.';
+  } catch (e) { stamp('bad', 'нет связи с таблицей'); }
 }
-$('save').onclick = async () => {
-  const c = cur; if (!c) return;
-  const city = $('city').value.trim() + ($('venue').value.trim() ? ', ' + $('venue').value.trim() : '');
-  const row = { date: $('date').value, city, cp: $('cp').value.trim(), sum: c.sum, bryl: c.E15, mgr: c.E16, petr: c.E18, adm: c.E19, extra: c.E17, type: curType };
-  if (!confirm(`Записать в «Концерты_корпоративы 2026»?\n\n${row.date.split('-').reverse().join('.')} · ${city} · ${row.cp}\nСумма ${fmt(row.sum)}, тип ${curType}`)) return;
-  const b = $('save'); b.disabled = true; b.textContent = 'Записываю…'; $('status').className = 'status'; $('status').textContent = '';
+
+// ---------- отправка ----------
+function rowData() {
+  const c = cur;
+  const city = $('city').value.trim();
+  return { date: $('date').value, city, cp: 'по заявке', sum: c.sum, bryl: c.E15, mgr: c.E16, petr: c.E18, adm: c.E19, extra: 0, type: curType() };
+}
+$('app').addEventListener('submit', e => {
+  e.preventDefault();
+  if (!validate()) return;
+  const row = rowData();
+  $('cf-body').innerHTML = [
+    ['Дата', row.date.split('-').reverse().join('.')], ['Тип', row.type], ['Город', row.city],
+    ['Сумма в таблицу', fmt(row.sum)], ['Гостюхин на руки', fmt(cur.C14)], ['Оборотка', fmt(cur.obor)]
+  ].map(([k, v]) => `<div class="kv"><span>${k}</span><b>${v}</b></div>`).join('');
+  $('veil').hidden = false;
+});
+$('cf-no').onclick = () => { $('veil').hidden = true; };
+$('veil').addEventListener('click', e => { if (e.target === $('veil')) $('veil').hidden = true; });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') $('veil').hidden = true; });
+$('cf-yes').onclick = async () => {
+  const row = rowData();
+  const b = $('cf-yes'); b.disabled = true; b.textContent = 'Отправляю…';
   try {
     const d = await api('POST', { k: KEY, row });
     if (!d.ok) throw new Error(d.error || 'не записалось');
-    $('status').className = 'status ok'; $('status').textContent = `Записано в строку ${d.rowNumber}. Гостюхину остаток ${fmt(d.gost)}` + (typeof d.check === 'number' ? `, проверка листа ${d.check}.` : '.');
-    toast(`Строка ${d.rowNumber} добавлена. <a href="${d.url}" target="_blank" rel="noopener">Открыть в таблице ↗</a>`, 12000);
+    $('veil').hidden = true;
+    $('done-msg').textContent = `Строка ${d.rowNumber} в листе «Концерты_корпоративы 2026»: ${row.date.split('-').reverse().join('.')}, ${row.city}, ${fmt(row.sum)}. Гостюхин на руки ${fmt(cur.C14)}, оборотка ${fmt(cur.obor)}` + (typeof d.check === 'number' ? `, проверка листа ${d.check}.` : '.');
+    $('done-open').href = d.url;
+    $('app').hidden = true; $('done').hidden = false;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
     try { const r = await api('GET'); if (r.ok) fillRefs(r.refs); } catch (e) {}
-  } catch (e) { $('status').className = 'status bad'; $('status').textContent = 'Не записалось: ' + String(e.message || e); }
-  finally { b.textContent = 'Записать в таблицу'; render(); }
+  } catch (e) {
+    $('veil').hidden = true;
+    $('err').textContent = 'Не отправилось: ' + String(e.message || e); $('err').classList.add('show');
+  } finally { b.disabled = false; b.textContent = 'Отправить'; }
 };
 boot();
 </script>
