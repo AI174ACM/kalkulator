@@ -1,0 +1,360 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow,noarchive">
+<title>Калькулятор концерта</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geologica:wght@400;500;600;700&family=Golos+Text:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  color-scheme:light;
+  --bg:#F2F4F3; --surface:#FFFFFF; --surface-2:#E9ECEB; --surface-3:#DFE4E2;
+  --ink:#131A1E; --ink-2:#4E5A60; --ink-3:#7F8B91; --line:#DDE2E1; --line-2:#EEF1F0;
+  --accent:#1C5CAB; --accent-soft:#E3ECF8;
+  --s1:#2a78d6; --s2:#eb6834; --s3:#1baf7a; --s4:#eda100; --sx:#8B949A;
+  --good:#0ca30c; --good-text:#006300; --warn:#fab219; --crit:#d03b3b;
+  --yellow:#FFF2CC; --green:#D9EAD3;
+  --shadow:0 1px 2px rgba(19,26,30,.05),0 8px 24px -12px rgba(19,26,30,.12);
+  --radius:14px;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --bg:#0F1214; --surface:#181C1F; --surface-2:#22282C; --surface-3:#2C3338;
+    --ink:#F2F4F3; --ink-2:#B9C2C7; --ink-3:#7F8B91; --line:#2A3135; --line-2:#222A2E;
+    --accent:#5598e7; --accent-soft:#1B2A3E;
+    --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#c98500; --sx:#6F7A80;
+    --good:#0ca30c; --good-text:#2ec22e; --warn:#fab219; --crit:#e05a5a;
+    --yellow:#3a3520; --green:#1f3324;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px -12px rgba(0,0,0,.6);
+  }
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{min-height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Golos Text",system-ui,-apple-system,"Segoe UI",sans-serif;font-size:14px;line-height:1.45;-webkit-font-smoothing:antialiased}
+h1,h2,h3{font-family:Geologica,"Golos Text",system-ui,sans-serif;margin:0;font-weight:600}
+a{color:var(--accent)}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.mono{font-family:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px}
+.num{font-variant-numeric:tabular-nums}
+.muted{color:var(--ink-3)}
+.sub{color:var(--ink-2)}
+
+.top{position:sticky;top:0;z-index:5;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.top-in{max-width:1180px;margin:0 auto;padding:14px 28px;display:flex;align-items:center;gap:20px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:12px}
+.brand-mark{width:34px;height:34px;border-radius:10px;background:var(--ink);color:var(--bg);display:grid;place-items:center;font-family:Geologica,sans-serif;font-weight:700;font-size:13px}
+.brand h1{font-size:17px;line-height:1.1}
+.brand .sub{font-size:12px;margin-top:2px}
+.spacer{flex:1}
+.stamp{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--ink-2)}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--good);box-shadow:0 0 0 3px color-mix(in srgb,var(--good) 20%,transparent)}
+.dot.bad{background:var(--crit);box-shadow:0 0 0 3px color-mix(in srgb,var(--crit) 20%,transparent)}
+.dot.wait{background:var(--warn);box-shadow:0 0 0 3px color-mix(in srgb,var(--warn) 25%,transparent)}
+
+main{max-width:1180px;margin:0 auto;padding:28px 28px 64px;display:grid;grid-template-columns:minmax(0,7fr) minmax(300px,5fr);gap:24px;align-items:start}
+.col{display:flex;flex-direction:column;gap:18px;min-width:0}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:20px 22px;display:flex;flex-direction:column;gap:14px;min-width:0;box-shadow:var(--shadow)}
+.card-h{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.card-h h2{font-size:16px}
+.card-h .step{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);font-weight:600}
+.hint{font-size:12.5px;color:var(--ink-2)}
+
+.fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 16px}
+.field{display:flex;flex-direction:column;gap:5px;min-width:0}
+.field.wide{grid-column:1/-1}
+.field label{font-size:12px;color:var(--ink-2);font-weight:500}
+.field .in{position:relative}
+.field input{width:100%;font:inherit;color:var(--ink);background:var(--yellow);border:1px solid var(--line);border-radius:10px;padding:10px 12px;transition:border-color .15s,box-shadow .15s}
+.field input:hover{border-color:var(--ink-3)}
+.field input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);outline:none}
+.field input.calc{background:var(--green);color:var(--ink-2)}
+.field input.plain{background:var(--surface)}
+.field input.money{text-align:right;font-variant-numeric:tabular-nums;padding-right:30px}
+.field .unit{position:absolute;right:11px;top:50%;transform:translateY(-50%);font-size:12px;color:var(--ink-3);pointer-events:none}
+.field .note{font-size:11.5px;color:var(--ink-3)}
+.legend{display:flex;gap:14px;font-size:12px;color:var(--ink-2);flex-wrap:wrap}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:3px;border:1px solid var(--line);vertical-align:-2px;margin-right:5px}
+
+.seg{display:inline-flex;background:var(--surface-2);border-radius:10px;padding:3px;gap:2px;flex-wrap:wrap}
+.seg button{padding:6px 12px;border-radius:8px;font-weight:500;color:var(--ink-2);white-space:nowrap;transition:background .15s,color .15s}
+.seg button:hover{color:var(--ink);background:var(--surface-3)}
+.seg button[aria-pressed="true"],.seg button[aria-pressed="true"]:hover{background:var(--accent);color:#fff;box-shadow:0 1px 2px rgba(19,26,30,.15)}
+
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-3);font-weight:600;text-align:left;padding:6px 0;border-bottom:1px solid var(--line)}
+td{padding:8px 0;border-bottom:1px solid var(--line-2);vertical-align:middle}
+td.r,th.r{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+tr:last-child td{border-bottom:0}
+td .who{display:flex;align-items:center;gap:8px}
+.sw{width:9px;height:9px;border-radius:50%;flex:none}
+td .rate{font-size:11.5px;color:var(--ink-3)}
+td input.rate-in{width:64px;font:inherit;font-size:12px;color:var(--ink-2);background:var(--surface-2);border:1px solid transparent;border-radius:6px;padding:3px 6px;text-align:right}
+td input.rate-in:focus{border-color:var(--accent);background:var(--surface);outline:none}
+
+.result{position:sticky;top:78px}
+.price{background:var(--ink);color:var(--bg);border-radius:var(--radius);padding:20px 22px;display:flex;flex-direction:column;gap:12px}
+.price .lbl{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:color-mix(in srgb,var(--bg) 60%,transparent);font-weight:600}
+.price .val{font-family:Geologica,sans-serif;font-size:34px;font-weight:600;letter-spacing:-.01em;line-height:1.1;font-variant-numeric:tabular-nums}
+.price .pill.ok{background:rgba(12,163,12,.25);color:#9be89b}
+.price .pill.bad{background:rgba(208,59,59,.3);color:#ffb3b3}
+.price .row{display:flex;justify-content:space-between;gap:12px;font-size:13px;color:color-mix(in srgb,var(--bg) 78%,transparent)}
+.price .row b{color:var(--bg);font-weight:500;font-variant-numeric:tabular-nums}
+.price hr{border:0;border-top:1px solid color-mix(in srgb,var(--bg) 18%,transparent);margin:2px 0}
+.kv{display:flex;justify-content:space-between;gap:12px;padding:7px 0;border-bottom:1px solid var(--line-2);font-size:13px}
+.kv:last-child{border-bottom:0}
+.kv b{font-weight:500;font-variant-numeric:tabular-nums;white-space:nowrap}
+.kv.total{font-weight:600}
+.kv.total b{font-weight:600}
+.pill{display:inline-flex;align-items:center;gap:6px;font-size:12px;padding:3px 9px;border-radius:999px;background:var(--surface-2);color:var(--ink-2)}
+.pill.ok{background:color-mix(in srgb,var(--good) 14%,transparent);color:var(--good-text)}
+.pill.bad{background:color-mix(in srgb,var(--crit) 14%,transparent);color:var(--crit)}
+.extra{background:var(--accent-soft);border-radius:10px;padding:10px 12px;font-size:13px;display:flex;flex-direction:column;gap:4px}
+.extra b{font-variant-numeric:tabular-nums}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:11px 18px;border-radius:10px;font-weight:600;background:var(--accent);color:#fff;transition:filter .15s,transform .05s;width:100%}
+.btn:hover{filter:brightness(1.08)}
+.btn:active{transform:translateY(1px)}
+.btn[disabled]{opacity:.55;cursor:not-allowed;filter:none}
+.btn.ghost{background:var(--surface-2);color:var(--ink);width:auto;padding:8px 14px;font-weight:500}
+.btn.ghost:hover{background:var(--surface-3)}
+.status{font-size:13px;min-height:1.4em}
+.status.ok{color:var(--good-text)}
+.status.bad{color:var(--crit)}
+.recent td{font-size:12.5px}
+.recent .t{font-size:11px;padding:2px 7px;border-radius:6px;background:var(--surface-2);color:var(--ink-2);white-space:nowrap}
+
+.gate{max-width:420px;margin:12vh auto;padding:0 20px;display:flex;flex-direction:column;gap:14px}
+.gate .card{gap:12px}
+.gate input{width:100%;font:inherit;padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--ink)}
+.gate .btn{width:auto}
+.foot{grid-column:1/-1;font-size:12px;color:var(--ink-3);display:flex;gap:14px;flex-wrap:wrap;padding-top:8px}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);opacity:0;background:var(--ink);color:var(--bg);padding:12px 18px;border-radius:12px;font-size:13px;box-shadow:var(--shadow);transition:opacity .2s,transform .2s;pointer-events:none;max-width:calc(100% - 32px)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);pointer-events:auto}
+.toast a{color:#9cc4ff}
+
+@media (max-width:900px){main{grid-template-columns:1fr;padding:16px 12px 40px;gap:16px}.result{position:static}.fields{grid-template-columns:1fr}.top-in{padding:10px 12px;gap:10px}.card{padding:16px}.price .val{font-size:30px}}
+</style>
+</head>
+<body>
+
+<div id="gate" class="gate" hidden>
+  <div class="brand"><div class="brand-mark">АК</div><div><h1>Калькулятор концерта</h1><div class="sub">ИП Гостюхин</div></div></div>
+  <div class="card">
+    <h2 style="font-size:16px">Доступа нет</h2>
+    <div class="hint">Страница открывается только по личной ссылке. Если ссылка есть, откройте её заново, или введите ключ из ссылки.</div>
+    <input id="gate-key" placeholder="Ключ доступа" autocomplete="off" spellcheck="false">
+    <div><button class="btn" id="gate-go">Войти</button></div>
+    <div id="gate-msg" class="status bad"></div>
+  </div>
+</div>
+
+<div id="app" hidden>
+<header class="top"><div class="top-in">
+  <div class="brand"><div class="brand-mark">АК</div><div><h1>Калькулятор концерта</h1><div class="sub">ИП Гостюхин · пишет в лист «Концерты_корпоративы 2026»</div></div></div>
+  <div class="spacer"></div>
+  <div class="stamp"><span id="dot" class="dot wait"></span><span id="stamp">связь с таблицей…</span></div>
+</div></header>
+
+<main>
+  <div class="col">
+    <div class="card">
+      <div class="card-h"><div><div class="step">Шаг 1</div><h2>О концерте</h2></div>
+        <div class="legend"><span><i style="background:var(--yellow)"></i>заполняем</span><span><i style="background:var(--green)"></i>считается само</span></div></div>
+      <div class="fields">
+        <div class="field"><label for="date">Дата концерта</label><div class="in"><input id="date" type="date"></div></div>
+        <div class="field"><label>Тип</label><div class="seg" id="type" role="group" aria-label="Тип"></div></div>
+        <div class="field"><label for="city">Город</label><div class="in"><input id="city" list="cities" placeholder="Киров" autocomplete="off"></div><datalist id="cities"></datalist></div>
+        <div class="field"><label for="venue">Площадка мероприятия</label><div class="in"><input id="venue" placeholder="Gaudi" autocomplete="off"></div></div>
+        <div class="field wide"><label for="cp">Заказчик (контрагент)</label><div class="in"><input id="cp" list="cps" placeholder="ИП Баранов (дог. №11-2026)" autocomplete="off"></div><datalist id="cps"></datalist></div>
+        <div class="field"><label for="mgr">Менеджеру за продажу, на руки</label><div class="in"><input id="mgr" class="money" inputmode="decimal" value="0"><span class="unit">₽</span></div><span class="note">0 = нет</span></div>
+        <div class="field"><label for="extra">Доп. расходы по безналу</label><div class="in"><input id="extra" class="money" inputmode="decimal" value="0"><span class="unit">₽</span></div><span class="note">0 = нет</span></div>
+        <div class="field wide"><label for="sold">Цена продажи, если согласована</label><div class="in"><input id="sold" class="money" inputmode="decimal" value="0"><span class="unit">₽</span></div><span class="note">0 = нет. Если указана, в таблицу встанет она, а не расчётная цена.</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-h"><div><div class="step">Шаг 2</div><h2>Кто получает и сколько на руки</h2></div><span class="hint">0 = нет</span></div>
+      <div class="fields">
+        <div class="field"><label for="gost">Гостюхин (Витя АК), остаётся на ИП</label><div class="in"><input id="gost" class="money" inputmode="decimal" value="600000"><span class="unit">₽</span></div></div>
+        <div class="field"><label for="bryl">ИП Брылин (Макс АК), на руки</label><div class="in"><input id="bryl" class="money" inputmode="decimal" value="100000"><span class="unit">₽</span></div></div>
+      </div>
+      <table>
+        <thead><tr><th>Участник</th><th class="r">На руки</th><th class="r">Ставка</th><th class="r">К перечислению</th></tr></thead>
+        <tbody id="parts"></tbody>
+      </table>
+      <div class="hint">Петрушенко: 10 % от всех выплат, ÷ 0,94 × 1,05. Админ: 7 % от Гостюхина, Брылина и Петрушенко, ÷ ставку Брылина. Ставки можно поправить прямо в таблице.</div>
+    </div>
+
+    <div class="card recent">
+      <div class="card-h"><h2>Последние строки в таблице</h2><a id="sheet-link" href="#" target="_blank" rel="noopener">открыть лист ↗</a></div>
+      <table><thead><tr><th>Дата</th><th>Город</th><th>Заказчик</th><th class="r">Сумма</th><th></th></tr></thead><tbody id="recent"><tr><td colspan="5" class="muted">загрузка…</td></tr></tbody></table>
+    </div>
+  </div>
+
+  <div class="col result">
+    <div class="price">
+      <div class="lbl">Цена для договора</div>
+      <div class="val num" id="p-contract">—</div>
+      <div class="row"><span>Все выплаты по концерту</span><b id="p-payouts">—</b></div>
+      <div class="row"><span>УСН 6 % (внутри цены)</span><b id="p-usn">—</b></div>
+      <div class="row"><span>Цена без НДС</span><b id="p-net">—</b></div>
+      <div class="row"><span>НДС 5 %</span><b id="p-nds">—</b></div>
+      <div class="row"><span>Итого с НДС</span><b id="p-gross">—</b></div>
+      <hr>
+      <div class="row"><span>Округлено вверх до 1 000</span><span id="p-check" class="pill ok">проверка 0</span></div>
+    </div>
+
+    <div class="card">
+      <div class="card-h"><div><div class="step">Шаг 3</div><h2>Строка в таблицу</h2></div><span id="p-type" class="pill"></span></div>
+      <div id="extra-box" class="extra" hidden>
+        <div>Продали дороже минимальной цены на <b id="x-over">—</b></div>
+        <div>Из них Гостюхину после НДС и УСН: <b id="x-gost">—</b></div>
+      </div>
+      <div>
+        <div class="kv total"><span>ИП Гостюхин (приход)</span><b id="r-sum">—</b></div>
+        <div class="kv"><span class="sub">НДС 5 %</span><b id="r-nds">—</b></div>
+        <div class="kv"><span class="sub">УСН 6 %</span><b id="r-usn">—</b></div>
+        <div class="kv"><span><span class="sw" style="background:var(--s1);display:inline-block;margin-right:7px"></span>Гостюхин (остаток)</span><b id="r-gost">—</b></div>
+        <div class="kv"><span><span class="sw" style="background:var(--s2);display:inline-block;margin-right:7px"></span>ИП Брылин</span><b id="r-bryl">—</b></div>
+        <div class="kv"><span><span class="sw" style="background:var(--sx);display:inline-block;margin-right:7px"></span>Менеджер</span><b id="r-mgr">—</b></div>
+        <div class="kv"><span><span class="sw" style="background:var(--s3);display:inline-block;margin-right:7px"></span>Петрушенко</span><b id="r-petr">—</b></div>
+        <div class="kv"><span><span class="sw" style="background:var(--s4);display:inline-block;margin-right:7px"></span>Админ (Мельников)</span><b id="r-adm">—</b></div>
+        <div class="kv"><span class="sub">Доп. расходы</span><b id="r-extra">—</b></div>
+      </div>
+      <button class="btn" id="save">Записать в таблицу</button>
+      <div id="status" class="status"></div>
+    </div>
+  </div>
+
+  <div class="foot"><span>Как разносим приход: НДС = сумма × 5/105 → УСН = (сумма − НДС) × 6 % → Брылин, менеджер, Петрушенко, админ как в шаге 2 → Гостюхин = остаток.</span><span id="whoami"></span></div>
+</main>
+</div>
+<div id="toast" class="toast"></div>
+
+<script>
+const API_URL = "https://script.google.com/macros/s/AKfycbwiIKyrzrE90wGlI4Vbzr0XGw7_YIjZ60g19D1dFqBEvsEDkxAjGeKQy_VRkVEhN_9spA/exec";
+const LS = 'calc_key';
+const $ = id => document.getElementById(id);
+const r2 = x => Math.round((x + Number.EPSILON) * 100) / 100;
+const fmt = x => (Math.round(x * 100) / 100).toLocaleString('ru-RU', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' ₽';
+const fmt0 = x => Math.round(x).toLocaleString('ru-RU') + ' ₽';
+const parseNum = s => { const n = Number(String(s ?? '').replace(/\s|₽/g, '').replace(',', '.')); return isFinite(n) ? n : 0; };
+const TYPES = ['Концерт', 'Корпоратив', 'Фест', 'Тур', 'Реклама'];
+const TYPE_BG = { 'Концерт': '#d9ead3', 'Корпоратив': '#fce5cd', 'Фест': '#c9daf8', 'Тур': '#f7caac', 'Реклама': '#fff2cc' };
+
+// ---------- доступ ----------
+let KEY = '';
+(function () {
+  const u = new URL(location.href); const k = u.searchParams.get('k');
+  try { if (k) { localStorage.setItem(LS, k); u.searchParams.delete('k'); history.replaceState(null, '', u.pathname + (u.search || '') + u.hash); } KEY = localStorage.getItem(LS) || ''; } catch (e) { KEY = k || ''; }
+})();
+function showGate(msg) { $('app').hidden = true; $('gate').hidden = false; $('gate-msg').textContent = msg || ''; }
+$('gate-go').onclick = () => { const k = $('gate-key').value.trim(); if (!k) return; KEY = k; try { localStorage.setItem(LS, k); } catch (e) {} boot(); };
+$('gate-key').addEventListener('keydown', e => { if (e.key === 'Enter') $('gate-go').click(); });
+
+// ---------- расчёт (1:1 с листом «Калькулятор_концерт») ----------
+const rates = { bryl: 0.93, mgr: 0.93, petr: 0.10, adm: 0.07 };
+function calc() {
+  const C14 = parseNum($('gost').value), C15 = parseNum($('bryl').value), C8 = parseNum($('mgr').value), C9 = parseNum($('extra').value), C10 = parseNum($('sold').value);
+  const D15 = rates.bryl, D16 = rates.mgr, D18 = rates.petr, D19 = rates.adm;
+  const E14 = C14;
+  const E15 = C15 === 0 ? 0 : r2(C15 / D15);
+  const C16 = C8, E16 = C16 === 0 ? 0 : r2(C16 / D16);
+  const C17 = C9, E17 = C17;
+  const C22 = r2((E14 + E15 + E16 + E17 + D19 * (C14 + C15) / D15) / (1 - D18 * 1.05 / 0.94 - D19 * D18 / D15));
+  const C18 = r2(D18 * C22), E18 = r2(C18 / 0.94 * 1.05);
+  const C19 = r2(D19 * (C14 + C15 + C18)), E19 = r2(C19 / D15);
+  const C24 = r2(C22 / 0.94), C23 = r2(C24 - C22), C25 = r2(C24 * 0.05), C26 = r2(C24 + C25), C27 = Math.ceil(C26 / 1000) * 1000;
+  const C30 = C10 === 0 ? 0 : r2(C10 - C26), C31 = C10 === 0 ? 0 : r2((C10 - C26) / 1.05 * 0.94);
+  const C33 = r2(C22 - (E14 + E15 + E16 + E17 + E18 + E19));
+  // строка в таблицу
+  const sum = C10 > 0 ? C10 : C27;
+  const nds = sum * 5 / 105, usn = (sum - nds) * 0.06;
+  const gostRest = r2(sum - nds - usn - E15 - E16 - E18 - E19 - E17);
+  return { C14, C15, C16, C17, C18, C19, E14, E15, E16, E17, E18, E19, C22, C23, C24, C25, C26, C27, C30, C31, C33, C10, sum, nds: r2(nds), usn: r2(usn), gostRest };
+}
+let cur = null, curType = 'Концерт';
+function render() {
+  const c = cur = calc();
+  $('p-contract').textContent = fmt0(c.C27);
+  $('p-payouts').textContent = fmt(c.C22); $('p-usn').textContent = fmt(c.C23); $('p-net').textContent = fmt(c.C24); $('p-nds').textContent = fmt(c.C25); $('p-gross').textContent = fmt(c.C26);
+  const ok = Math.abs(c.C33) < 0.011; $('p-check').className = 'pill ' + (ok ? 'ok' : 'bad'); $('p-check').textContent = ok ? 'проверка 0' : 'проверка ' + c.C33.toFixed(2);
+  const rows = [
+    ['Гостюхин (Витя АК), остаётся на ИП', 'var(--s1)', c.C14, '', c.E14],
+    ['ИП Брылин (Макс АК)', 'var(--s2)', c.C15, 'bryl', c.E15],
+    ['Менеджер за продажу', 'var(--sx)', c.C16, 'mgr', c.E16],
+    ['Доп. расходы по безналу', 'var(--sy,#c7ced2)', c.C17, '', c.E17],
+    ['Петрушенко, ' + (rates.petr * 100).toLocaleString('ru-RU') + ' % от чистой', 'var(--s3)', c.C18, 'petr', c.E18],
+    ['Админ (Мельников), ' + (rates.adm * 100).toLocaleString('ru-RU') + ' %', 'var(--s4)', c.C19, 'adm', c.E19],
+  ];
+  $('parts').innerHTML = rows.map(([n, col, hand, rk, wire]) => `<tr><td><span class="who"><span class="sw" style="background:${col}"></span>${n}</span></td><td class="r">${fmt(hand)}</td><td class="r">${rk ? `<input class="rate-in num" data-rate="${rk}" value="${String(rates[rk]).replace('.', ',')}">` : '<span class="rate">—</span>'}</td><td class="r"><b>${fmt(wire)}</b></td></tr>`).join('');
+  document.querySelectorAll('.rate-in').forEach(i => i.addEventListener('change', e => { const v = parseNum(e.target.value); if (v > 0 && v <= 1) rates[e.target.dataset.rate] = v; render(); }));
+  $('extra-box').hidden = !(c.C10 > 0); $('x-over').textContent = fmt(c.C30); $('x-gost').textContent = fmt(c.C31);
+  $('r-sum').textContent = fmt(c.sum); $('r-nds').textContent = fmt(c.nds); $('r-usn').textContent = fmt(c.usn); $('r-gost').textContent = fmt(c.gostRest);
+  $('r-bryl').textContent = fmt(c.E15); $('r-mgr').textContent = fmt(c.E16); $('r-petr').textContent = fmt(c.E18); $('r-adm').textContent = fmt(c.E19); $('r-extra').textContent = fmt(c.E17);
+  $('p-type').textContent = curType; $('p-type').style.background = TYPE_BG[curType]; $('p-type').style.color = '#131A1E';
+  $('save').disabled = !(c.sum > 0) || !($('date').value) || !$('city').value.trim() || !$('cp').value.trim();
+}
+['gost', 'bryl', 'mgr', 'extra', 'sold'].forEach(id => {
+  const el = $(id);
+  el.addEventListener('input', render);
+  el.addEventListener('focus', () => { el.value = String(parseNum(el.value) || '').replace('.', ','); el.select(); });
+  el.addEventListener('blur', () => { const v = parseNum(el.value); el.value = v.toLocaleString('ru-RU', { maximumFractionDigits: 2 }); render(); });
+  el.dispatchEvent(new Event('blur'));
+});
+['date', 'city', 'cp', 'venue'].forEach(id => $(id).addEventListener('input', render));
+$('type').innerHTML = TYPES.map(t => `<button type="button" aria-pressed="${t === curType}">${t}</button>`).join('');
+$('type').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; curType = b.textContent; [...$('type').children].forEach(x => x.setAttribute('aria-pressed', x === b)); render(); });
+
+// ---------- связь с таблицей ----------
+function toast(html, ms) { const t = $('toast'); t.innerHTML = html; t.classList.add('show'); clearTimeout(t._t); t._t = setTimeout(() => t.classList.remove('show'), ms || 6000); }
+async function api(method, payload) {
+  const opt = method === 'POST' ? { method: 'POST', body: JSON.stringify(payload), headers: { 'Content-Type': 'text/plain;charset=utf-8' }, redirect: 'follow' } : { method: 'GET', redirect: 'follow' };
+  const url = method === 'POST' ? API_URL : API_URL + '?k=' + encodeURIComponent(KEY) + '&t=' + Date.now();
+  const res = await fetch(url, opt);
+  const txt = await res.text();
+  try { return JSON.parse(txt); } catch (e) { throw new Error('Таблица ответила не по-русски: ' + txt.slice(0, 80)); }
+}
+function fillRefs(refs) {
+  $('cps').innerHTML = refs.contractors.map(c => `<option value="${c.replace(/"/g, '&quot;')}">`).join('');
+  $('cities').innerHTML = refs.cities.map(c => `<option value="${c.replace(/"/g, '&quot;')}">`).join('');
+  $('sheet-link').href = refs.sheetUrl;
+  $('recent').innerHTML = refs.recent.length ? refs.recent.map(r => `<tr><td class="mono">${r.date}</td><td>${r.city}</td><td class="sub">${r.cp}</td><td class="r">${fmt0(r.sum)}</td><td><span class="t" style="background:${TYPE_BG[r.type] || 'var(--surface-2)'};color:#131A1E">${r.type || ''}</span></td></tr>`).join('') : '<tr><td colspan="5" class="muted">пусто</td></tr>';
+}
+async function boot() {
+  if (!KEY) { showGate(''); return; }
+  $('gate').hidden = true; $('app').hidden = false;
+  if (!$('date').value) { const d = new Date(); $('date').value = d.toISOString().slice(0, 10); }
+  render();
+  if (!API_URL || API_URL.indexOf('http') !== 0) { $('dot').className = 'dot bad'; $('stamp').textContent = 'таблица не подключена'; return; }
+  try {
+    const d = await api('GET');
+    if (!d.ok) { showGate(d.error || 'Доступа нет'); try { localStorage.removeItem(LS); } catch (e) {} return; }
+    fillRefs(d.refs); $('dot').className = 'dot'; $('stamp').textContent = 'таблица на связи';
+    $('whoami').textContent = 'Личная ссылка: ' + ({ admin: 'Мельников', gost: 'Гостюхин', petr: 'Петрушенко' }[d.role] || d.role) + '.';
+  } catch (e) { $('dot').className = 'dot bad'; $('stamp').textContent = 'нет связи с таблицей'; $('status').className = 'status bad'; $('status').textContent = String(e.message || e); }
+}
+$('save').onclick = async () => {
+  const c = cur; if (!c) return;
+  const city = $('city').value.trim() + ($('venue').value.trim() ? ', ' + $('venue').value.trim() : '');
+  const row = { date: $('date').value, city, cp: $('cp').value.trim(), sum: c.sum, bryl: c.E15, mgr: c.E16, petr: c.E18, adm: c.E19, extra: c.E17, type: curType };
+  if (!confirm(`Записать в «Концерты_корпоративы 2026»?\n\n${row.date.split('-').reverse().join('.')} · ${city} · ${row.cp}\nСумма ${fmt(row.sum)}, тип ${curType}`)) return;
+  const b = $('save'); b.disabled = true; b.textContent = 'Записываю…'; $('status').className = 'status'; $('status').textContent = '';
+  try {
+    const d = await api('POST', { k: KEY, row });
+    if (!d.ok) throw new Error(d.error || 'не записалось');
+    $('status').className = 'status ok'; $('status').textContent = `Записано в строку ${d.rowNumber}. Гостюхину остаток ${fmt(d.gost)}` + (typeof d.check === 'number' ? `, проверка листа ${d.check}.` : '.');
+    toast(`Строка ${d.rowNumber} добавлена. <a href="${d.url}" target="_blank" rel="noopener">Открыть в таблице ↗</a>`, 12000);
+    try { const r = await api('GET'); if (r.ok) fillRefs(r.refs); } catch (e) {}
+  } catch (e) { $('status').className = 'status bad'; $('status').textContent = 'Не записалось: ' + String(e.message || e); }
+  finally { b.textContent = 'Записать в таблицу'; render(); }
+};
+boot();
+</script>
+</body>
+</html>
