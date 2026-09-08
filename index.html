@@ -250,8 +250,8 @@
       <label class="f"><span class="req">Цена концерта, общая</span><span class="money"><input type="text" id="price" inputmode="decimal" placeholder="0" data-req="Цена концерта" data-money></span><small class="note not-tgk">сумма на руки всем: из неё Петрушенко 10 %, Брылин, остальное Гостюхину</small><small class="note tgk-only">сумма на руки всем: из неё Петрушенко 10 %, Микрюков, остальное поровну Вибе и Аверину</small></label>
       <div class="row" id="row-hands">
         <label class="f tgk-only"><span class="req">Микрюков</span><span class="money"><input type="text" id="mikr" inputmode="decimal" value="60 000" data-req="Микрюков" data-money></span><small class="note">диджей · обычно 60 000, можно поправить</small></label>
-        <label class="f not-ad not-tgk"><span class="req">Брылин</span><span class="money"><input type="text" id="bryl" inputmode="decimal" value="100 000" data-req="Брылин" data-money></span><small class="note">Макс АК · обычно 100 000, можно поправить</small></label>
-        <label class="f"><span>Петрушенко</span><span class="money"><input type="text" id="petr" readonly tabindex="-1" value="0"></span><small class="note">считается сам: 10 % от цены концерта</small></label>
+        <label class="f not-ad not-tgk"><span class="req">Брылин</span><span class="money"><input type="text" id="bryl" inputmode="decimal" value="100 000" data-req="Брылин" data-money></span><small class="note">Макс АК · обычно 100 000, можно поправить · к перечислению ÷ 0,93</small></label>
+        <label class="f"><span>Петрушенко</span><span class="money"><input type="text" id="petr" readonly tabindex="-1" value="0"></span><small class="note not-tgk">считается сам: 10 % от цены, к перечислению + его УСН и НДС</small><small class="note tgk-only">считается сам: 10 % от цены концерта</small></label>
       </div>
       <div class="row tgk-only">
         <label class="f"><span>Вибе</span><span class="money"><input type="text" id="vibe" readonly tabindex="-1" value="0"></span><small class="note">считается сам: половина остатка</small></label>
@@ -282,12 +282,12 @@
       <div class="kv sub"><span>НДС 5 %</span><b id="r-nds">—</b></div>
       <div class="kv sub"><span>УСН 6 %</span><b id="r-usn">—</b></div>
       <div class="kv not-tgk"><span><i class="sw" style="background:#5598e7"></i>Гостюхин, доля от цены</span><b id="r-gost14">—</b></div>
-      <div class="kv not-ad not-tgk"><span><i class="sw" style="background:#eb6834"></i>ИП Брылин</span><b id="r-bryl">—</b></div>
+      <div class="kv not-ad not-tgk"><span><i class="sw" style="background:#eb6834"></i>ИП Брылин <small class="hint" style="margin:0">на руки ÷ 0,93</small></span><b id="r-bryl">—</b></div>
       <div class="kv tgk-only"><span><i class="sw" style="background:#5598e7"></i>ИП Аверин <small class="hint" style="margin:0">на руки ÷ 0,93</small></span><b id="r-averin">—</b></div>
       <div class="kv tgk-only"><span><i class="sw" style="background:#eb6834"></i>ИП Вибе <small class="hint" style="margin:0">на руки ÷ 0,93</small></span><b id="r-vibe">—</b></div>
       <div class="kv tgk-only"><span><i class="sw" style="background:#c9a86a"></i>Микрюков <small class="hint" style="margin:0">на руки ÷ 0,93</small></span><b id="r-mikr">—</b></div>
-      <div class="kv"><span><i class="sw" style="background:#3ddc84"></i>Петрушенко</span><b id="r-petr">—</b></div>
-      <div class="kv"><span><i class="sw" style="background:#ffd60a"></i>Админ (Мельников)<small class="hint tgk-only" style="margin:0;display:inline!important">&nbsp;на руки ÷ 0,93</small></span><b id="r-adm">—</b></div>
+      <div class="kv"><span><i class="sw" style="background:#3ddc84"></i>Петрушенко<small class="hint not-tgk" style="margin:0;display:inline!important">&nbsp;на руки + УСН и НДС</small></span><b id="r-petr">—</b></div>
+      <div class="kv"><span><i class="sw" style="background:#ffd60a"></i>Админ (Мельников)<small class="hint" style="margin:0;display:inline!important">&nbsp;на руки ÷ 0,93</small></span><b id="r-adm">—</b></div>
       <div class="kv obor"><span><i class="sw" style="background:#3ddc84"></i><span id="r-obor-l">Оборотка</span> <small class="hint" style="margin:0">доп. расходы, хвост округления, надбавка</small></span><b id="r-obor">—</b></div>
       <p class="hint not-tgk" style="margin:12px 0 0">В таблице колонка «Гостюхин» = доля + оборотка: <b id="r-gost" style="color:var(--text)">—</b>.</p>
 
@@ -298,7 +298,7 @@
             <thead><tr><th>Участник</th><th class="r">Сумма</th><th class="r">Ставка</th></tr></thead>
             <tbody id="parts"></tbody>
           </table></div>
-          <p class="hint" style="margin:12px 0 0"><span class="not-tgk">Общая цена концерта делится: Петрушенко 10 %, Брылин (обычно 100 000), остальное Гостюхину. Сверху админ 7 % от цены и доп. расходы, затем УСН 6 % (÷ 0,94) и НДС 5 % (× 1,05), округление вверх до 1 000. Хвост округления и надбавка в «Цене по договору» уходят в оборотку.</span><span class="tgk-only" style="display:inline!important">Общая цена делится: Петрушенко 10 %, Микрюков (обычно 60 000), остальное поровну Вибе и Аверину. Сверху админ 7 % от цены и доп. расходы. Вибе, Аверину, Микрюкову и админу перечисляем ÷ 0,93. Затем УСН 6 % (÷ 0,94) и НДС 5 % (× 1,05), вверх до 1 000, хвост в остаток.</span> Проценты можно поправить в таблице выше. <span id="p-check"></span></p>
+          <p class="hint" style="margin:12px 0 0"><span class="not-tgk">Общая цена концерта делится: Петрушенко 10 %, Брылин (обычно 100 000), остальное Гостюхину. К перечислению: Петрушенко + его УСН 6 % и НДС 5 % (× 1,05 ÷ 0,94), Брылин и админ ÷ 0,93. Сверху админ 7 % от цены и доп. расходы, затем УСН 6 % (÷ 0,94) и НДС 5 % (× 1,05), округление вверх до 1 000. Хвост округления и надбавка в «Цене по договору» уходят в оборотку.</span><span class="tgk-only" style="display:inline!important">Общая цена делится: Петрушенко 10 %, Микрюков (обычно 60 000), остальное поровну Вибе и Аверину. Сверху админ 7 % от цены и доп. расходы. Вибе, Аверину, Микрюкову и админу перечисляем ÷ 0,93. Затем УСН 6 % (÷ 0,94) и НДС 5 % (× 1,05), вверх до 1 000, хвост в остаток.</span> Проценты можно поправить в таблице выше. <span id="p-check"></span></p>
         </div>
       </details>
     </section>
@@ -357,7 +357,7 @@ const GS = 'calc_group';
 let GROUP = 'ak47'; try { GROUP = localStorage.getItem(GS) === 'tgk' ? 'tgk' : 'ak47'; } catch (e) {}
 const isTgk = () => GROUP === 'tgk';
 const GROUP_TXT = {
-  ak47: { logo: 'АК-47', kicker: 'ИП Гостюхин · для своих', sum: 'ИП Гостюхин, приход', obor: 'Оборотка', recent: 'Последние строки в таблице', foot: 'Как разносим приход: НДС = сумма × 5/105 → УСН = (сумма − НДС) × 6 % → Брылин, Петрушенко 10 %, админ 7 % → Гостюхин = остаток (доля + оборотка).' },
+  ak47: { logo: 'АК-47', kicker: 'ИП Гостюхин · для своих', sum: 'ИП Гостюхин, приход', obor: 'Оборотка', recent: 'Последние строки в таблице', foot: 'Как разносим приход: НДС = сумма × 5/105 → УСН = (сумма − НДС) × 6 % → Брылин ÷ 0,93, Петрушенко 10 % + его налоги, админ 7 % ÷ 0,93 → Гостюхин = остаток (доля + оборотка).' },
   tgk:  { logo: 'TGK', kicker: 'ИП Петрушенко · для своих', sum: 'ИП Петрушенко, приход', obor: 'Остаток', recent: 'Последние строки в таблице Петрушенко', foot: 'Как разносим приход: НДС = сумма × 5/105 → УСН = (сумма − НДС) × 6 % → Аверин, Вибе, Микрюков, админ (÷ 0,93), Петрушенко 10 % → остаток в оборотку.' }
 };
 function applyGroup() {
@@ -436,11 +436,11 @@ function calc() {
   // Гостюхин = P − Петрушенко − Брылин. Админ 7 % от P сверху. Затем УСН 6 % (÷ 0,94) и НДС 5 % (× 1,05), вверх до 1 000.
   const ad = isAd();
   const P = parseNum($('price').value), B = ad ? 0 : parseNum($('bryl').value), X = parseNum($('extra').value), S = parseNum($('sold').value);
-  const petrHand = r2(rates.petr * P), I = petrHand;
-  const H = B;
-  const L = r2(P - petrHand - H);                                        // Гостюхин на руки
-  const admHand = r2((ad ? AD_ADM : rates.adm) * P), J = admHand;        // админ сверху
-  const base = P + J + X;                                                // всё, что должно остаться после налогов
+  const petrHand = r2(rates.petr * P), I = r2(petrHand * (1 + NDS) / (1 - USN));   // Петрушенко: на руки → к перечислению + его УСН 6 % и НДС 5 %
+  const H = B === 0 ? 0 : r2(B / COEF);                                  // Брылин: на руки → к перечислению ÷ 0,93
+  const L = r2(P - petrHand - B);                                        // Гостюхин на руки
+  const admHand = r2((ad ? AD_ADM : rates.adm) * P), J = r2(admHand / COEF);   // админ сверху, ÷ 0,93
+  const base = L + H + I + J + X;                                        // все перечисления (с надбавками) + доп. расходы — это должно остаться после налогов
   const noVat = base / (1 - USN);                                        // цена без НДС, внутри УСН 6 %
   const Draw = r2(noVat * (1 + NDS));                                    // итого с НДС до округления
   const C27 = P > 0 ? Math.ceil(Draw / 1000) * 1000 : 0;                 // расчётная цена: вверх до 1 000
@@ -452,7 +452,7 @@ function calc() {
   const obor = r2(gostRest - L);
   const C22 = r2(L + H + X + I + J);
   const C33 = r2(Cn - (L + H + I + J + obor));
-  return { P, C14: L, C15: H, C17: X, C18: petrHand, C19: admHand, E14: L, E15: H, E16: 0, E17: X, E18: I, E19: J,
+  return { P, C14: L, C15: B, C17: X, C18: petrHand, C19: admHand, E14: L, E15: H, E16: 0, E17: X, E18: I, E19: J,
            C22, C23: F, C24: r2(sum - E), C25: E, C26: Draw, C27, C33, C10: S, sum, nds: E, usn: F, gostRest, obor, low, ad, gostNeg: P > 0 && L <= 0 };
 }
 function calcTgk() {
@@ -503,9 +503,9 @@ function render() {
     ['Доп. расходы по безналу, сверху', c.C17, ''],
   ] : [
     ['Гостюхин (Витя АК), остаток от цены', c.C14, ''],
-    ...(ad ? [] : [['ИП Брылин (Макс АК)', c.C15, '']]),
-    ['Петрушенко, ' + (rates.petr * 100).toLocaleString('ru-RU') + ' % от цены', c.C18, 'petr'],
-    ['Админ (Мельников), ' + ((ad ? AD_ADM : rates.adm) * 100).toLocaleString('ru-RU') + ' % от цены, сверху', c.C19, ad ? '' : 'adm'],
+    ...(ad ? [] : [['ИП Брылин (Макс АК): на руки ' + fmt(c.C15) + ', к перечислению ÷ 0,93', c.E15, '']]),
+    ['Петрушенко: ' + (rates.petr * 100).toLocaleString('ru-RU') + ' % от цены = ' + fmt(c.C18) + ', к перечислению + УСН и НДС', c.E18, 'petr'],
+    ['Админ (Мельников): ' + ((ad ? AD_ADM : rates.adm) * 100).toLocaleString('ru-RU') + ' % от цены = ' + fmt(c.C19) + ', сверху, ÷ 0,93', c.E19, ad ? '' : 'adm'],
     ['Доп. расходы по безналу, сверху', c.C17, ''],
   ];
   $('parts').innerHTML = rows.map(([n, hand, rk]) => `<tr><td>${n}</td><td class="r" data-l="Сумма"><b>${fmt(hand)}</b></td><td class="r" data-l="Ставка">${rk ? `<input class="rate-in" data-rate="${rk}" value="${(rates[rk] * 100).toLocaleString('ru-RU') + ' %'}">` : '—'}</td></tr>`).join('');
