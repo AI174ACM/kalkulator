@@ -33,6 +33,17 @@
   .ad-only{display:none!important}
   .ad .ad-only{display:block!important}
   .ad #row-hands{grid-template-columns:1fr}
+  .tgk .not-tgk{display:none!important}
+  .tgk .opts.two{grid-template-columns:1fr}
+  .tgk-only{display:none!important}
+  .tgk label.tgk-only{display:flex!important}
+  .tgk .kv.tgk-only{display:flex!important}
+  .tgk .row.tgk-only{display:grid!important}
+  .tgk small.tgk-only,.tgk p.tgk-only,.tgk span.tgk-only{display:block!important}
+  .tgk .logo .word{border-color:var(--accent);color:var(--accent)}
+  .grp{display:inline-flex;background:rgba(255,255,255,.04);border:1px solid var(--line2);border-radius:999px;padding:4px;gap:4px;margin-bottom:22px}
+  .grp button{font:700 13px/1 var(--display);letter-spacing:.06em;padding:10px 20px;border-radius:999px;border:0;background:transparent;color:var(--muted);cursor:pointer;transition:background .15s,color .15s}
+  .grp button[aria-pressed="true"]{background:var(--accent);color:var(--accent-text)}
 
   /* ---------- шапка ---------- */
   .hero{text-align:center;margin-bottom:34px}
@@ -197,10 +208,14 @@
 <body>
 <div class="wrap">
   <header class="hero">
-    <div class="logos">
-      <div class="logo"><span class="word">АК-47</span></div>
+    <div class="grp" id="grp" role="group" aria-label="Группа">
+      <button type="button" data-g="ak47" aria-pressed="true">АК-47</button>
+      <button type="button" data-g="tgk" aria-pressed="false">ТГК</button>
     </div>
-    <div class="kicker">ИП Гостюхин · для своих</div>
+    <div class="logos">
+      <div class="logo"><span class="word" id="logo-word">АК-47</span></div>
+    </div>
+    <div class="kicker" id="kicker">ИП Гостюхин · для своих</div>
     <h1>Калькулятор концерта</h1>
     <div id="stamp" class="stamp" hidden><i></i><span id="stamp-t">связь с таблицей…</span></div>
   </header>
@@ -225,22 +240,28 @@
       <label class="f"><span class="req">Тип</span></label>
       <div class="opts two" id="type" style="margin-bottom:0">
         <label class="opt"><input type="radio" name="type" value="Концерт" checked><span class="dot"></span><b>Концерт</b></label>
-        <label class="opt"><input type="radio" name="type" value="Реклама"><span class="dot"></span><b>Реклама</b></label>
+        <label class="opt not-tgk"><input type="radio" name="type" value="Реклама"><span class="dot"></span><b>Реклама</b></label>
       </div>
       <p class="hint" style="margin:0">Площадку и реквизиты заказчик укажет в заявке — отсюда они в таблицу не идут.</p>
     </section>
 
     <section class="card">
       <h2><span class="n">2</span>Цена и доли<span class="tip">0 = нет</span></h2>
-      <label class="f"><span class="req">Цена концерта, общая</span><span class="money"><input type="text" id="price" inputmode="decimal" placeholder="0" data-req="Цена концерта" data-money></span><small class="note">сумма на руки всем: из неё Петрушенко 10 %, Брылин, остальное Гостюхину</small></label>
+      <label class="f"><span class="req">Цена концерта, общая</span><span class="money"><input type="text" id="price" inputmode="decimal" placeholder="0" data-req="Цена концерта" data-money></span><small class="note not-tgk">сумма на руки всем: из неё Петрушенко 10 %, Брылин, остальное Гостюхину</small><small class="note tgk-only">сумма на руки всем: из неё Петрушенко 10 %, Микрюков, остальное поровну Вибе и Аверину</small></label>
       <div class="row" id="row-hands">
-        <label class="f not-ad"><span class="req">Брылин</span><span class="money"><input type="text" id="bryl" inputmode="decimal" value="100 000" data-req="Брылин" data-money></span><small class="note">Макс АК · обычно 100 000, можно поправить</small></label>
-        <label class="f"><span>Петрушенко</span><span class="money"><input type="text" id="petr" readonly tabindex="-1" value="0"></span><small class="note not-ad">считается сам: 10 % от цены концерта</small><small class="note ad-only">считается сам: 10 % от цены</small></label>
+        <label class="f tgk-only"><span class="req">Микрюков</span><span class="money"><input type="text" id="mikr" inputmode="decimal" value="60 000" data-req="Микрюков" data-money></span><small class="note">диджей · обычно 60 000, можно поправить</small></label>
+        <label class="f not-ad not-tgk"><span class="req">Брылин</span><span class="money"><input type="text" id="bryl" inputmode="decimal" value="100 000" data-req="Брылин" data-money></span><small class="note">Макс АК · обычно 100 000, можно поправить</small></label>
+        <label class="f"><span>Петрушенко</span><span class="money"><input type="text" id="petr" readonly tabindex="-1" value="0"></span><small class="note">считается сам: 10 % от цены концерта</small></label>
+      </div>
+      <div class="row tgk-only">
+        <label class="f"><span>Вибе</span><span class="money"><input type="text" id="vibe" readonly tabindex="-1" value="0"></span><small class="note">считается сам: половина остатка</small></label>
+        <label class="f"><span>Аверин</span><span class="money"><input type="text" id="averin" readonly tabindex="-1" value="0"></span><small class="note">считается сам: половина остатка</small></label>
       </div>
       <div class="row">
-        <label class="f"><span>Гостюхин</span><span class="money"><input type="text" id="gost" readonly tabindex="-1" value="0"></span><small class="note">считается сам: цена минус Петрушенко и Брылин</small></label>
-        <label class="f"><span class="req">Доп. расходы</span><span class="money"><input type="text" id="extra" inputmode="decimal" value="0" data-req="Доп. расходы" data-money></span><small class="note">по безналу, 0 = нет · войдут в цену и лягут в оборотку</small></label>
+        <label class="f not-tgk"><span>Гостюхин</span><span class="money"><input type="text" id="gost" readonly tabindex="-1" value="0"></span><small class="note">считается сам: цена минус Петрушенко и Брылин</small></label>
+        <label class="f"><span class="req">Доп. расходы</span><span class="money"><input type="text" id="extra" inputmode="decimal" value="0" data-req="Доп. расходы" data-money></span><small class="note">по безналу, 0 = нет · войдут в цену и лягут в остаток</small></label>
       </div>
+      <p class="hint tgk-only" style="margin:4px 0 0">ТГК: Вибе, Аверину, Микрюкову и админу перечисляем ÷ 0,93, чтобы на руки осталось ровно столько. Петрушенко без надбавки.</p>
       <p class="hint ad-only" style="margin:4px 0 0">Реклама: Брылина нет, Петрушенко 10 % от цены, Гостюхину остальное, админ 3 % от цены сверху, затем УСН 6 % и НДС 5 %.</p>
     </section>
 
@@ -250,22 +271,25 @@
         <div><div class="lbl">Цена для договора</div><div class="val" id="p-contract">—</div><div class="hint" style="margin:8px 0 0" id="p-note">вверх до 1 000</div></div>
         <div class="side">все выплаты по концерту<b id="p-payouts">—</b></div>
       </div>
-      <label class="f"><span>Цена по договору, если хочешь круглее</span><span class="money"><input type="text" id="sold" inputmode="decimal" value="" placeholder="как расчётная" data-money></span><small class="note">Расчётная цена <b id="p-min">—</b>. Можно поставить больше, например круглую сумму: разница целиком уйдёт в оборотку, доли Петрушенко и админа не изменятся. Меньше расчётной нельзя.</small></label>
+      <label class="f"><span>Цена по договору, если хочешь круглее</span><span class="money"><input type="text" id="sold" inputmode="decimal" value="" placeholder="как расчётная" data-money></span><small class="note">Расчётная цена <b id="p-min">—</b>. Можно поставить больше, например круглую сумму: разница целиком уйдёт в остаток, доли не изменятся. Меньше расчётной нельзя.</small></label>
       <div class="kv"><span>Цена без НДС <small class="hint" style="margin:0">от цены в таблицу</small></span><b id="p-net">—</b></div>
       <div class="kv sub"><span>в ней УСН 6 %</span><b id="p-usn">—</b></div>
       <div class="kv"><span>НДС 5 %</span><b id="p-nds">—</b></div>
       <div class="kv"><span>Итого с НДС до округления</span><b id="p-gross">—</b></div>
 
       <div class="sub-h">Строка в таблицу</div>
-      <div class="kv total"><span>ИП Гостюхин, приход</span><b id="r-sum">—</b></div>
+      <div class="kv total"><span id="r-sum-l">ИП Гостюхин, приход</span><b id="r-sum">—</b></div>
       <div class="kv sub"><span>НДС 5 %</span><b id="r-nds">—</b></div>
       <div class="kv sub"><span>УСН 6 %</span><b id="r-usn">—</b></div>
-      <div class="kv"><span><i class="sw" style="background:#5598e7"></i>Гостюхин, доля от цены</span><b id="r-gost14">—</b></div>
-      <div class="kv obor"><span><i class="sw" style="background:#3ddc84"></i>Оборотка <small class="hint" style="margin:0">доп. расходы, хвост округления, надбавка</small></span><b id="r-obor">—</b></div>
-      <div class="kv not-ad"><span><i class="sw" style="background:#eb6834"></i>ИП Брылин</span><b id="r-bryl">—</b></div>
+      <div class="kv not-tgk"><span><i class="sw" style="background:#5598e7"></i>Гостюхин, доля от цены</span><b id="r-gost14">—</b></div>
+      <div class="kv not-ad not-tgk"><span><i class="sw" style="background:#eb6834"></i>ИП Брылин</span><b id="r-bryl">—</b></div>
+      <div class="kv tgk-only"><span><i class="sw" style="background:#5598e7"></i>ИП Аверин <small class="hint" style="margin:0">на руки ÷ 0,93</small></span><b id="r-averin">—</b></div>
+      <div class="kv tgk-only"><span><i class="sw" style="background:#eb6834"></i>ИП Вибе <small class="hint" style="margin:0">на руки ÷ 0,93</small></span><b id="r-vibe">—</b></div>
+      <div class="kv tgk-only"><span><i class="sw" style="background:#c9a86a"></i>Микрюков <small class="hint" style="margin:0">на руки ÷ 0,93</small></span><b id="r-mikr">—</b></div>
       <div class="kv"><span><i class="sw" style="background:#3ddc84"></i>Петрушенко</span><b id="r-petr">—</b></div>
-      <div class="kv"><span><i class="sw" style="background:#ffd60a"></i>Админ (Мельников)</span><b id="r-adm">—</b></div>
-      <p class="hint" style="margin:12px 0 0">В таблице колонка «Гостюхин» = доля + оборотка: <b id="r-gost" style="color:var(--text)">—</b>.</p>
+      <div class="kv"><span><i class="sw" style="background:#ffd60a"></i>Админ (Мельников)<small class="hint tgk-only" style="margin:0;display:inline!important">&nbsp;на руки ÷ 0,93</small></span><b id="r-adm">—</b></div>
+      <div class="kv obor"><span><i class="sw" style="background:#3ddc84"></i><span id="r-obor-l">Оборотка</span> <small class="hint" style="margin:0">доп. расходы, хвост округления, надбавка</small></span><b id="r-obor">—</b></div>
+      <p class="hint not-tgk" style="margin:12px 0 0">В таблице колонка «Гостюхин» = доля + оборотка: <b id="r-gost" style="color:var(--text)">—</b>.</p>
 
       <details>
         <summary>Подробный расчёт и ставки</summary>
@@ -274,7 +298,7 @@
             <thead><tr><th>Участник</th><th class="r">Сумма</th><th class="r">Ставка</th></tr></thead>
             <tbody id="parts"></tbody>
           </table></div>
-          <p class="hint" style="margin:12px 0 0">Общая цена концерта делится: Петрушенко 10 %, Брылин (обычно 100 000), остальное Гостюхину. Сверху админ 7 % от цены и доп. расходы, затем УСН 6 % (÷ 0,94) и НДС 5 % (× 1,05), округление вверх до 1 000. Хвост округления и надбавка в «Цене по договору» уходят в оборотку. Проценты можно поправить в таблице выше. <span id="p-check"></span></p>
+          <p class="hint" style="margin:12px 0 0"><span class="not-tgk">Общая цена концерта делится: Петрушенко 10 %, Брылин (обычно 100 000), остальное Гостюхину. Сверху админ 7 % от цены и доп. расходы, затем УСН 6 % (÷ 0,94) и НДС 5 % (× 1,05), округление вверх до 1 000. Хвост округления и надбавка в «Цене по договору» уходят в оборотку.</span><span class="tgk-only" style="display:inline!important">Общая цена делится: Петрушенко 10 %, Микрюков (обычно 60 000), остальное поровну Вибе и Аверину. Сверху админ 7 % от цены и доп. расходы. Вибе, Аверину, Микрюкову и админу перечисляем ÷ 0,93. Затем УСН 6 % (÷ 0,94) и НДС 5 % (× 1,05), вверх до 1 000, хвост в остаток.</span> Проценты можно поправить в таблице выше. <span id="p-check"></span></p>
         </div>
       </details>
     </section>
@@ -300,11 +324,11 @@
   </section>
 
   <section class="card recent" id="recent-card" hidden>
-    <h2><span class="n">≡</span>Последние строки в таблице<a class="tip" id="sheet-link" href="#" target="_blank" rel="noopener">открыть лист ↗</a></h2>
+    <h2><span class="n">≡</span><span id="recent-title">Последние строки в таблице</span><a class="tip" id="sheet-link" href="#" target="_blank" rel="noopener">открыть лист ↗</a></h2>
     <div style="overflow-x:auto"><table><thead><tr><th>Дата</th><th>Город</th><th>Заказчик</th><th class="r">Сумма</th><th></th></tr></thead><tbody id="recent"><tr><td colspan="5" class="hint">загрузка…</td></tr></tbody></table></div>
   </section>
 
-  <p class="foot" id="foot">Как разносим приход: НДС = сумма × 5/105 → УСН = (сумма − НДС) × 6 % → Брылин, Петрушенко 10 %, админ 7 % → Гостюхин = остаток (доля + оборотка).</p>
+  <p class="foot" id="foot"></p>
 </div>
 
 <!-- подтверждение -->
@@ -328,7 +352,23 @@ const fmt = x => (Math.round(x * 100) / 100).toLocaleString('ru-RU', { minimumFr
 const fmt0 = x => Math.round(x).toLocaleString('ru-RU') + ' ₽';
 const parseNum = s => { const t = String(s ?? '').replace(/\s|₽/g, '').replace(',', '.'); const n = Number(t.replace('%', '')); if (!isFinite(n)) return 0; return t.indexOf('%') >= 0 ? n / 100 : n; };
 const TYPE_BG = { 'Концерт': '#d9ead3', 'Корпоратив': '#fce5cd', 'Фест': '#c9daf8', 'Тур': '#f7caac', 'Реклама': '#fff2cc' };
-const MONEY = ['price', 'bryl', 'extra', 'sold'];
+const MONEY = ['price', 'bryl', 'mikr', 'extra', 'sold'];
+const GS = 'calc_group';
+let GROUP = 'ak47'; try { GROUP = localStorage.getItem(GS) === 'tgk' ? 'tgk' : 'ak47'; } catch (e) {}
+const isTgk = () => GROUP === 'tgk';
+const GROUP_TXT = {
+  ak47: { logo: 'АК-47', kicker: 'ИП Гостюхин · для своих', sum: 'ИП Гостюхин, приход', obor: 'Оборотка', recent: 'Последние строки в таблице', foot: 'Как разносим приход: НДС = сумма × 5/105 → УСН = (сумма − НДС) × 6 % → Брылин, Петрушенко 10 %, админ 7 % → Гостюхин = остаток (доля + оборотка).' },
+  tgk:  { logo: 'TGK', kicker: 'ИП Петрушенко · для своих', sum: 'ИП Петрушенко, приход', obor: 'Остаток', recent: 'Последние строки в таблице Петрушенко', foot: 'Как разносим приход: НДС = сумма × 5/105 → УСН = (сумма − НДС) × 6 % → Аверин, Вибе, Микрюков, админ (÷ 0,93), Петрушенко 10 % → остаток в оборотку.' }
+};
+function applyGroup() {
+  document.body.classList.toggle('tgk', isTgk()); $('app').classList.toggle('tgk', isTgk());
+  document.querySelectorAll('#grp button').forEach(b => b.setAttribute('aria-pressed', b.dataset.g === GROUP));
+  const t = GROUP_TXT[GROUP];
+  $('logo-word').textContent = t.logo; $('kicker').textContent = t.kicker; $('r-sum-l').textContent = t.sum; $('r-obor-l').textContent = t.obor; $('recent-title').textContent = t.recent;
+  $('foot').textContent = t.foot + (whoTxt ? ' Личная ссылка: ' + whoTxt + '.' : '');
+  if (isTgk()) { const c = document.querySelector('input[name=type][value="Концерт"]'); if (c) c.checked = true; }
+}
+let whoTxt = '';
 
 // ---------- города для подсказок ----------
 const CITIES_RU = ['Москва','Санкт-Петербург','Новосибирск','Екатеринбург','Казань','Нижний Новгород','Красноярск','Челябинск','Самара','Уфа','Ростов-на-Дону','Краснодар','Омск','Воронеж','Пермь','Волгоград','Саратов','Тюмень','Тольятти','Барнаул','Махачкала','Ижевск','Хабаровск','Ульяновск','Иркутск','Владивосток','Ярославль','Кемерово','Томск','Набережные Челны','Ставрополь','Оренбург','Новокузнецк','Балашиха','Рязань','Севастополь','Пенза','Чебоксары','Липецк','Калининград','Астрахань','Тула','Киров','Сочи','Курск','Улан-Удэ','Сургут','Тверь','Магнитогорск','Якутск','Брянск','Иваново','Владимир','Чита','Белгород','Нижний Тагил','Симферополь','Архангельск','Калуга','Волжский','Смоленск','Саранск','Череповец','Курган','Вологда','Орёл','Владикавказ','Подольск','Грозный','Мурманск','Тамбов','Петрозаводск','Стерлитамак','Нижневартовск','Кострома','Новороссийск','Йошкар-Ола','Химки','Таганрог','Комсомольск-на-Амуре','Сыктывкар','Нальчик','Нижнекамск','Шахты','Дзержинск','Орск','Братск','Благовещенск','Энгельс','Ангарск','Королёв','Великий Новгород','Старый Оскол','Мытищи','Псков','Люберцы','Бийск','Южно-Сахалинск','Армавир','Прокопьевск','Балаково','Абакан','Норильск','Рыбинск','Северодвинск','Петропавловск-Камчатский','Красногорск','Уссурийск','Волгодонск','Новочеркасск','Каменск-Уральский','Златоуст','Электросталь','Альметьевск','Салават','Миасс','Керчь','Находка','Копейск','Пятигорск','Рубцовск','Березники','Коломна','Майкоп','Одинцово','Хасавюрт','Ковров','Кисловодск','Нефтеюганск','Нефтекамск','Новочебоксарск','Серпухов','Щёлково','Домодедово','Первоуральск','Черкесск','Дербент','Орехово-Зуево','Невинномысск','Назрань','Димитровград','Кызыл','Обнинск','Новый Уренгой','Ессентуки','Каспийск','Октябрьский','Раменское','Долгопрудный','Камышин','Муром','Новомосковск','Жуковский','Северск','Ноябрьск','Евпатория','Артём','Пушкино','Арзамас','Ачинск','Бердск','Элиста','Ногинск','Елец','Сергиев Посад','Новошахтинск','Железногорск','Зеленодольск','Тобольск','Междуреченск','Сарапул','Ленинск-Кузнецкий','Воткинск','Ухта','Соликамск','Глазов','Магадан','Великие Луки','Мичуринск','Канск','Киселёвск','Новотроицк','Бузулук','Ялта','Каменск-Шахтинский','Губкин','Бугульма','Ейск','Реутов','Кинешма','Чайковский','Азов','Ханты-Мансийск','Биробиджан','Нарьян-Мар','Анадырь','Салехард','Горно-Алтайск','Анапа','Геленджик','Туапсе','Феодосия','Выборг','Гатчина','Клин','Дмитров','Егорьевск','Воскресенск','Ступино','Наро-Фоминск','Фрязино','Лобня','Ивантеевка','Дубна','Зеленоград','Тихвин','Кириши','Сосновый Бор','Всеволожск','Колпино','Пушкин','Апатиты','Мончегорск','Кандалакша','Котлас','Великий Устюг','Костомукша','Кондопога','Североморск','Печора','Усинск','Воркута','Корсаков','Холмск'];
@@ -386,10 +426,12 @@ $('gate-key').addEventListener('keydown', e => { if (e.key === 'Enter') { e.prev
 
 // ---------- расчёт (1:1 с листом «Калькулятор_концерт») ----------
 const rates = { petr: 0.10, adm: 0.07 };   // Петрушенко и админ — проценты от общей цены концерта
+const COEF = 0.93;                          // ТГК: на руки → к перечислению (÷ 0,93)
 const USN = 0.06, NDS = 0.05, AD_ADM = 0.03;   // реклама: админ 3 % от прихода
 const isAd = () => curType() === 'Реклама';
 const curType = () => (document.querySelector('input[name=type]:checked') || {}).value || 'Концерт';
 function calc() {
+  if (isTgk()) return calcTgk();
   // Логика от 08.09.2026: P — общая цена концерта (на руки всем). Петрушенко 10 % от P, Брылин — ввод (обычно 100 000),
   // Гостюхин = P − Петрушенко − Брылин. Админ 7 % от P сверху. Затем УСН 6 % (÷ 0,94) и НДС 5 % (× 1,05), вверх до 1 000.
   const ad = isAd();
@@ -413,6 +455,30 @@ function calc() {
   return { P, C14: L, C15: H, C17: X, C18: petrHand, C19: admHand, E14: L, E15: H, E16: 0, E17: X, E18: I, E19: J,
            C22, C23: F, C24: r2(sum - E), C25: E, C26: Draw, C27, C33, C10: S, sum, nds: E, usn: F, gostRest, obor, low, ad, gostNeg: P > 0 && L <= 0 };
 }
+function calcTgk() {
+  // ТГК (08.09.2026): P — общая цена. Петрушенко 10 % от P (без надбавки), Микрюков — ввод (обычно 60 000),
+  // Вибе и Аверин поровну остаток. Админ 7 % от P сверху. Вибе, Аверину, Микрюкову, админу перечисляем ÷ 0,93.
+  // Затем доп. расходы, УСН 6 % (÷ 0,94), НДС 5 % (× 1,05), вверх до 1 000; хвост — в колонку «Остаток».
+  const P = parseNum($('price').value), M = parseNum($('mikr').value), X = parseNum($('extra').value), S = parseNum($('sold').value);
+  const petrHand = r2(rates.petr * P), K = petrHand;
+  const each = r2((P - petrHand - M) / 2);
+  const admHand = r2(rates.adm * P);
+  const G = r2(each / COEF), H = G, I = r2(M / COEF), J = r2(admHand / COEF);
+  const base = G + H + I + J + K + X;
+  const noVat = base / (1 - USN);
+  const Draw = r2(noVat * (1 + NDS));
+  const C27 = P > 0 ? Math.ceil(Draw / 1000) * 1000 : 0;
+  const low = S > 0 && S < C27;
+  const sum = S > C27 ? S : C27;
+  const Eraw = sum * NDS / (1 + NDS), Fraw = (sum - Eraw) * USN;
+  const E = r2(Eraw), F = r2(Fraw), Cn = r2(sum - Eraw - Fraw);
+  const rest = r2(sum - Eraw - Fraw - G - H - I - J - K);                 // колонка «Остаток»: доп. расходы + хвост + надбавка
+  const C22 = r2(base);
+  const C33 = r2(Cn - (G + H + I + J + K + rest));
+  return { P, tgk: true, C14: each, C15: 0, C17: X, C18: petrHand, C19: admHand, E14: each, E15: 0, E16: 0, E17: X, E18: K, E19: J,
+           averin: each, vibe: each, mikr: M, trAverin: G, trVibe: H, trMikr: I,
+           C22, C23: F, C24: r2(sum - E), C25: E, C26: Draw, C27, C33, C10: S, sum, nds: E, usn: F, gostRest: rest, obor: rest, low, ad: false, gostNeg: P > 0 && each <= 0 };
+}
 let cur = null;
 function render() {
   const c = cur = calc();
@@ -428,7 +494,14 @@ function render() {
   $('p-payouts').textContent = F(c.C22); $('p-usn').textContent = F(c.C23); $('p-net').textContent = F(c.C24); $('p-nds').textContent = F(c.C25); $('p-gross').textContent = F(c.C26);
   const ok = Math.abs(c.C33) < 0.011; $('p-check').textContent = has ? (ok ? 'Служебная проверка формул: 0.' : 'Проверка формул: ' + c.C33.toFixed(2) + ' — так быть не должно.') : '';
   $('p-check').style.color = ok ? '' : 'var(--err)';
-  const rows = [
+  const rows = c.tgk ? [
+    ['Аверин: на руки ' + fmt(c.averin) + ', к перечислению ÷ 0,93', c.trAverin, ''],
+    ['Вибе: на руки ' + fmt(c.vibe) + ', к перечислению ÷ 0,93', c.trVibe, ''],
+    ['Микрюков: на руки ' + fmt(c.mikr) + ', к перечислению ÷ 0,93', c.trMikr, ''],
+    ['Петрушенко, ' + (rates.petr * 100).toLocaleString('ru-RU') + ' % от цены, без надбавки', c.C18, 'petr'],
+    ['Админ (Мельников): ' + (rates.adm * 100).toLocaleString('ru-RU') + ' % от цены сверху, ÷ 0,93', c.E19, 'adm'],
+    ['Доп. расходы по безналу, сверху', c.C17, ''],
+  ] : [
     ['Гостюхин (Витя АК), остаток от цены', c.C14, ''],
     ...(ad ? [] : [['ИП Брылин (Макс АК)', c.C15, '']]),
     ['Петрушенко, ' + (rates.petr * 100).toLocaleString('ru-RU') + ' % от цены', c.C18, 'petr'],
@@ -439,8 +512,12 @@ function render() {
   document.querySelectorAll('.rate-in').forEach(i => i.addEventListener('change', e => { const v = parseNum(e.target.value); if (v > 0 && v < 1) rates[e.target.dataset.rate] = v; render(); }));
   $('r-sum').textContent = F(c.sum); $('r-nds').textContent = F(c.nds); $('r-usn').textContent = F(c.usn); $('r-gost').textContent = F(c.gostRest); $('r-gost14').textContent = F(c.C14); $('r-obor').textContent = F(c.obor);
   $('petr').value = has ? c.C18.toLocaleString('ru-RU', { maximumFractionDigits: 2 }) : '0';
-  $('gost').value = has ? c.C14.toLocaleString('ru-RU', { maximumFractionDigits: 2 }) : '0';
-  $('gost').classList.toggle('bad', !!c.gostNeg);
+  $('gost').value = has && !c.tgk ? c.C14.toLocaleString('ru-RU', { maximumFractionDigits: 2 }) : '0';
+  $('gost').classList.toggle('bad', !!c.gostNeg && !c.tgk);
+  $('vibe').value = has && c.tgk ? c.vibe.toLocaleString('ru-RU', { maximumFractionDigits: 2 }) : '0';
+  $('averin').value = has && c.tgk ? c.averin.toLocaleString('ru-RU', { maximumFractionDigits: 2 }) : '0';
+  $('vibe').classList.toggle('bad', !!c.gostNeg && !!c.tgk); $('averin').classList.toggle('bad', !!c.gostNeg && !!c.tgk);
+  $('r-averin').textContent = has && c.tgk ? fmt(c.trAverin) : '—'; $('r-vibe').textContent = has && c.tgk ? fmt(c.trVibe) : '—'; $('r-mikr').textContent = has && c.tgk ? fmt(c.trMikr) : '—';
   $('r-bryl').textContent = F(c.E15); $('r-petr').textContent = F(c.E18); $('r-adm').textContent = F(c.E19);
 }
 MONEY.forEach(id => {
@@ -451,6 +528,7 @@ MONEY.forEach(id => {
 });
 ['date', 'city'].forEach(id => $(id).addEventListener('input', () => { $(id).classList.remove('bad'); hideErr(); }));
 document.querySelectorAll('input[name=type]').forEach(r => r.addEventListener('change', render));
+$('grp').addEventListener('click', e => { const b = e.target.closest('button[data-g]'); if (!b || b.dataset.g === GROUP) return; GROUP = b.dataset.g; try { localStorage.setItem(GS, GROUP); } catch (x) {} lastSaved = null; applyGroup(); hideErr(); render(); if (API_URL && API_URL.indexOf('http') === 0) loadRefs(1); });
 
 // ---------- проверка заполненности ----------
 function hideErr() { $('err').classList.remove('show'); }
@@ -459,7 +537,8 @@ function validate() {
   let first = null;
   const ad = isAd();
   document.querySelectorAll('#app [data-req]').forEach(el => {
-    if (ad && el.id === 'bryl') { el.classList.remove('bad'); return; }
+    if ((ad || isTgk()) && el.id === 'bryl') { el.classList.remove('bad'); return; }
+    if (!isTgk() && el.id === 'mikr') { el.classList.remove('bad'); return; }
     if (el.id === 'gost') return;
     const empty = el.value.trim() === '';
     el.classList.toggle('bad', empty);
@@ -468,7 +547,7 @@ function validate() {
   const other = [];
   if (!missing.length && cur && cur.low) { other.push('Цена по договору меньше расчётной ' + fmt0(cur.C27) + '.'); $('sold').classList.add('bad'); first = first || $('sold'); }
   if (!missing.length && !other.length && !(cur && cur.P > 0)) { other.push('Цена концерта должна быть больше нуля.'); $('price').classList.add('bad'); first = first || $('price'); }
-  if (!missing.length && !other.length && cur && cur.gostNeg) { other.push('Гостюхину ничего не остаётся: уменьшите Брылина или увеличьте цену.'); $('bryl').classList.add('bad'); first = first || $('bryl'); }
+  if (!missing.length && !other.length && cur && cur.gostNeg) { other.push(isTgk() ? 'Вибе и Аверину ничего не остаётся: уменьшите Микрюкова или увеличьте цену.' : 'Гостюхину ничего не остаётся: уменьшите Брылина или увеличьте цену.'); $(isTgk() ? 'mikr' : 'bryl').classList.add('bad'); first = first || $(isTgk() ? 'mikr' : 'bryl'); }
   if (missing.length || other.length) {
     $('err').textContent = [missing.length ? 'Не заполнено: ' + missing.join(', ') + '.' : '', ...other].filter(Boolean).join(' ');
     $('err').classList.add('show');
@@ -485,7 +564,7 @@ function resetAll(keepDate) {
   ['city', 'price'].forEach(id => { $(id).value = ''; $(id).classList.remove('bad'); });
   $('gost').value = '0'; $('gost').classList.remove('bad');
   $('extra').value = '0'; $('extra').classList.remove('bad'); $('sold').value = ''; $('sold').classList.remove('bad');
-  $('bryl').value = '100 000'; $('bryl').classList.remove('bad');
+  $('bryl').value = '100 000'; $('bryl').classList.remove('bad'); $('mikr').value = '60 000'; $('mikr').classList.remove('bad');
   if (!keepDate) $('date').value = new Date().toISOString().slice(0, 10);
   $('date').classList.remove('bad');
   document.querySelector('input[name=type][value="Концерт"]').checked = true;
@@ -498,7 +577,7 @@ $('done-new').onclick = () => { $('done').hidden = true; $('app').hidden = false
 // ---------- связь с таблицей ----------
 async function api(method, payload) {
   const opt = method === 'POST' ? { method: 'POST', body: JSON.stringify(payload), headers: { 'Content-Type': 'text/plain;charset=utf-8' }, redirect: 'follow' } : { method: 'GET', redirect: 'follow' };
-  const url = method === 'POST' ? API_URL : API_URL + '?k=' + encodeURIComponent(KEY) + '&t=' + Date.now();
+  const url = method === 'POST' ? API_URL : API_URL + '?k=' + encodeURIComponent(KEY) + '&g=' + GROUP + '&t=' + Date.now();
   const ctrl = new AbortController(); const tm = setTimeout(() => ctrl.abort(), 45000); opt.signal = ctrl.signal;
   let res; try { res = await fetch(url, opt); } finally { clearTimeout(tm); }
   const txt = await res.text();
@@ -509,12 +588,12 @@ function fillRefs(refs) {
   CITY_POOL = [...new Set([...refs.cities, ...CITY_POOL])];
   $('sheet-link').href = refs.sheetUrl;
   const isNew = r => lastSaved && r.date === lastSaved.date && r.city === lastSaved.city && Math.abs(r.sum - lastSaved.sum) < 0.01;
-  $('recent').innerHTML = refs.recent.length ? refs.recent.map(r => `<tr class="${isNew(r) ? 'new' : ''}"><td>${r.date}${isNew(r) ? '<span class="badge">новая</span>' : ''}</td><td>${r.city}</td><td>${r.cp}</td><td class="r"><b>${fmt0(r.sum)}</b></td><td><span class="t" style="background:${TYPE_BG[r.type] || 'var(--line)'};color:#0b0b0d">${r.type || ''}</span></td></tr>`).join('') : '<tr><td colspan="5" class="hint">пусто</td></tr>';
+  $('recent').innerHTML = refs.recent.length ? refs.recent.map(r => `<tr class="${isNew(r) ? 'new' : ''}"><td>${r.date}${isNew(r) ? '<span class="badge">новая</span>' : ''}</td><td>${r.city}</td><td>${r.cp}</td><td class="r"><b>${fmt0(r.sum)}</b></td><td>${r.type ? `<span class="t" style="background:${TYPE_BG[r.type] || 'var(--line)'};color:#0b0b0d">${r.type}</span>` : ''}</td></tr>`).join('') : '<tr><td colspan="5" class="hint">пусто</td></tr>';
 }
 function stamp(cls, text) { const s = $('stamp'); s.hidden = false; s.className = 'stamp ' + cls; $('stamp-t').textContent = text; }
 async function boot() {
   if (!KEY) { showGate(''); return; }
-  $('gate').hidden = true; $('app').hidden = false; $('recent-card').hidden = false; setManifest();
+  $('gate').hidden = true; $('app').hidden = false; $('recent-card').hidden = false; setManifest(); applyGroup();
   if (!$('date').value) $('date').value = new Date().toISOString().slice(0, 10);
   render();
   if (!API_URL || API_URL.indexOf('http') !== 0) { stamp('bad', 'таблица не подключена'); return; }
@@ -530,7 +609,7 @@ async function loadRefs(attempt) {
     const d = await api('GET');
     if (!d.ok) { showGate(d.error || 'Доступа нет'); try { localStorage.removeItem(LS); } catch (e) {} return; }
     fillRefs(d.refs); stamp('ok', 'таблица на связи');
-    if (!refsLoaded) { refsLoaded = true; $('foot').textContent += ' Личная ссылка: ' + ({ admin: 'Мельников', gost: 'Гостюхин', petr: 'Петрушенко' }[d.role] || d.role) + '.'; }
+    whoTxt = ({ admin: 'Мельников', gost: 'Гостюхин', petr: 'Петрушенко' }[d.role] || d.role); refsLoaded = true; applyGroup();
   } catch (e) {
     if (attempt < 3) { setTimeout(() => loadRefs(attempt + 1), 4000); return; }
     stamp('bad', 'нет связи с таблицей');
@@ -543,6 +622,7 @@ async function loadRefs(attempt) {
 function rowData() {
   const c = cur;
   const city = $('city').value.trim();
+  if (c.tgk) return { date: $('date').value, city, cp: 'по заявке', sum: c.sum, averin: c.trAverin, vibe: c.trVibe, mikr: c.trMikr, adm: c.E19, petr: c.E18, type: 'Концерт' };
   return { date: $('date').value, city, cp: 'по заявке', sum: c.sum, bryl: c.E15, mgr: c.E16, petr: c.E18, adm: c.E19, extra: 0, type: curType() };
 }
 $('app').addEventListener('submit', e => {
@@ -551,7 +631,7 @@ $('app').addEventListener('submit', e => {
   const row = rowData();
   $('cf-body').innerHTML = [
     ['Дата', row.date.split('-').reverse().join('.')], ['Тип', row.type], ['Город', row.city],
-    ['Цена концерта', fmt(cur.P)], ['Сумма в таблицу', fmt(row.sum)], ['Гостюхин', fmt(cur.C14)], ['Оборотка', fmt(cur.obor)]
+    ['Цена концерта', fmt(cur.P)], ['Сумма в таблицу', fmt(row.sum)], ...(cur.tgk ? [['Аверин', fmt(cur.trAverin)], ['Вибе', fmt(cur.trVibe)], ['Остаток', fmt(cur.obor)]] : [['Гостюхин', fmt(cur.C14)], ['Оборотка', fmt(cur.obor)]])
   ].map(([k, v]) => `<div class="kv"><span>${k}</span><b>${v}</b></div>`).join('');
   $('veil').hidden = false;
 });
@@ -562,15 +642,15 @@ $('cf-yes').onclick = async () => {
   const row = rowData();
   const b = $('cf-yes'); b.disabled = true; b.textContent = 'Отправляю…';
   try {
-    const d = await api('POST', { k: KEY, row });
+    const d = await api('POST', { k: KEY, g: GROUP, row });
     if (!d.ok) throw new Error(d.error || 'не записалось');
     $('veil').hidden = true;
-    $('done-msg').textContent = `Строка ${d.rowNumber} в листе «Концерты_корпоративы 2026»: ${row.date.split('-').reverse().join('.')}, ${row.city}, ${row.type}` + (typeof d.check === 'number' ? `. Проверка листа: ${d.check}.` : '.');
+    $('done-msg').textContent = `Строка ${d.rowNumber} в листе «${cur.tgk ? 'Концерты/корпоративы» (ИП Петрушенко)' : 'Концерты_корпоративы 2026»'}: ${row.date.split('-').reverse().join('.')}, ${row.city}, ${row.type}` + (typeof d.check === 'number' ? `. Проверка листа: ${d.check}.` : '.');
     $('done-open').href = d.url;
     lastSaved = { date: row.date.split('-').reverse().join('.'), city: row.city, sum: row.sum };
     $('done-rows').innerHTML = [
       ['Приход в таблицу', fmt(row.sum), true], ['НДС 5 %', fmt(d.nds)], ['УСН 6 %', fmt(d.usn)],
-      ['Гостюхин (доля + оборотка)', fmt(d.gost)], ...(cur.ad ? [] : [['ИП Брылин', fmt(row.bryl)]]), ['Петрушенко', fmt(row.petr)], ['Админ', fmt(row.adm)]
+      ...(cur.tgk ? [['ИП Аверин', fmt(row.averin)], ['ИП Вибе', fmt(row.vibe)], ['Микрюков', fmt(row.mikr)], ['Админ', fmt(row.adm)], ['Петрушенко', fmt(row.petr)], ['Остаток', fmt(d.rest)]] : [['Гостюхин (доля + оборотка)', fmt(d.gost)], ...(cur.ad ? [] : [['ИП Брылин', fmt(row.bryl)]]), ['Петрушенко', fmt(row.petr)], ['Админ', fmt(row.adm)]])
     ].map(([k, v, t]) => `<div class="kv${t ? ' total' : ''}"><span>${k}</span><b>${v}</b></div>`).join('');
     $('app').hidden = true; $('done').hidden = false;
     window.scrollTo({ top: 0, behavior: 'smooth' });
