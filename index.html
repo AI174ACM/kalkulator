@@ -134,7 +134,19 @@
   .recent tr.new td:first-child{border-left:3px solid var(--accent);padding-left:8px}
   .recent .badge{font-size:11px;padding:2px 8px;border-radius:6px;background:var(--accent);color:var(--accent-text);font-weight:700;margin-left:8px;white-space:nowrap}
   .card h2 a.tip{text-decoration:none;color:var(--accent)}
+  .parts-wrap{overflow-x:auto;max-width:100%}
+  .kv{align-items:flex-start}
   @media (max-width:560px){
+    .kicker{font-size:11px;letter-spacing:.16em}
+    .kv span small.hint{display:block;margin-top:2px}
+    #parts-table thead{display:none}
+    #parts-table tr{display:grid;grid-template-columns:1fr 1fr;gap:6px 10px;padding:12px 0;border-bottom:1px solid var(--line)}
+    #parts-table tr:last-child{border-bottom:0}
+    #parts-table td{display:block;padding:0;border:0;text-align:left;white-space:normal}
+    #parts-table td:first-child{grid-column:1/-1;color:var(--text);font-weight:600;font-size:14px}
+    #parts-table td.r{text-align:left}
+    #parts-table td.r::before{content:attr(data-l);display:block;font-size:10.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px}
+    #parts-table td input.rate-in{width:100%;text-align:left}
     .recent thead{display:none}
     .recent tr{display:grid;grid-template-columns:1fr auto;grid-template-areas:"date sum" "city sum" "cp type";column-gap:12px;padding:10px 0;border-bottom:1px solid var(--line)}
     .recent tr:last-child{border-bottom:0}
@@ -188,7 +200,7 @@
     <div class="logos">
       <div class="logo"><span class="word">АК-47</span></div>
     </div>
-    <div class="kicker">ИП Гостюхин · внутренний инструмент</div>
+    <div class="kicker">ИП Гостюхин · для своих</div>
     <h1>Калькулятор концерта</h1>
     <div id="stamp" class="stamp" hidden><i></i><span id="stamp-t">связь с таблицей…</span></div>
   </header>
@@ -196,7 +208,7 @@
   <!-- доступа нет -->
   <section id="gate" class="card gate" hidden>
     <h2><span class="n">!</span>Доступа нет</h2>
-    <p class="hint" style="margin-top:0">Страница открывается только по личной ссылке. Откройте свою ссылку заново или вставьте её целиком в поле ниже — ключ подставится сам.</p>
+    <p class="hint" style="margin-top:0" id="gate-hint">Страница открывается только по личной ссылке. Откройте свою ссылку заново или вставьте её целиком в поле ниже — ключ подставится сам.</p>
     <label class="f"><span>Ключ доступа</span><input type="text" id="gate-key" autocomplete="off" spellcheck="false" placeholder="ссылка или ключ из неё"></label>
     <button class="btn btn-main" id="gate-go" type="button">Войти</button>
     <div class="err" id="gate-msg"></div>
@@ -219,16 +231,17 @@
     </section>
 
     <section class="card">
-      <h2><span class="n">2</span>Кто получает и сколько на руки<span class="tip">0 = нет</span></h2>
+      <h2><span class="n">2</span>Цена и доли<span class="tip">0 = нет</span></h2>
+      <label class="f"><span class="req">Цена концерта, общая</span><span class="money"><input type="text" id="price" inputmode="decimal" placeholder="0" data-req="Цена концерта" data-money></span><small class="note">сумма на руки всем: из неё Петрушенко 10 %, Брылин, остальное Гостюхину</small></label>
       <div class="row" id="row-hands">
-        <label class="f"><span class="req">Гостюхин, на руки</span><span class="money"><input type="text" id="gost" inputmode="decimal" placeholder="0" data-req="Гостюхин на руки" data-money></span><small class="note">Витя АК, остаётся на ИП</small></label>
-        <label class="f not-ad"><span class="req">Брылин, на руки</span><span class="money"><input type="text" id="bryl" inputmode="decimal" value="100 000" data-req="Брылин на руки" data-money></span><small class="note">Макс АК · обычно 100 000, к перечислению ÷ 0,93</small></label>
+        <label class="f not-ad"><span class="req">Брылин</span><span class="money"><input type="text" id="bryl" inputmode="decimal" value="100 000" data-req="Брылин" data-money></span><small class="note">Макс АК · обычно 100 000, можно поправить</small></label>
+        <label class="f"><span>Петрушенко</span><span class="money"><input type="text" id="petr" readonly tabindex="-1" value="0"></span><small class="note not-ad">считается сам: 10 % от цены концерта</small><small class="note ad-only">считается сам: 10 % от цены</small></label>
       </div>
       <div class="row">
-        <label class="f"><span>Петрушенко, на руки</span><span class="money"><input type="text" id="petr" readonly tabindex="-1" value="0"></span><small class="note not-ad">считается сам: 10 % от чистой, к перечислению + его УСН и НДС</small><small class="note ad-only">считается сам: 10 % от Гостюхина, к перечислению + его УСН и НДС</small></label>
+        <label class="f"><span>Гостюхин</span><span class="money"><input type="text" id="gost" readonly tabindex="-1" value="0"></span><small class="note">считается сам: цена минус Петрушенко и Брылин</small></label>
         <label class="f"><span class="req">Доп. расходы</span><span class="money"><input type="text" id="extra" inputmode="decimal" value="0" data-req="Доп. расходы" data-money></span><small class="note">по безналу, 0 = нет · войдут в цену и лягут в оборотку</small></label>
       </div>
-      <p class="hint ad-only" style="margin:4px 0 0">Реклама: Брылина нет, Петрушенко 10 % от Гостюхина на руки, админ 3 % от Гостюхина и Петрушенко на руки (÷ 0,93), сверху УСН 6 % и НДС 5 %, округление вверх до 1 000.</p>
+      <p class="hint ad-only" style="margin:4px 0 0">Реклама: Брылина нет, Петрушенко 10 % от цены, Гостюхину остальное, админ 3 % от цены сверху, затем УСН 6 % и НДС 5 %.</p>
     </section>
 
     <section class="card">
@@ -247,21 +260,21 @@
       <div class="kv total"><span>ИП Гостюхин, приход</span><b id="r-sum">—</b></div>
       <div class="kv sub"><span>НДС 5 %</span><b id="r-nds">—</b></div>
       <div class="kv sub"><span>УСН 6 %</span><b id="r-usn">—</b></div>
-      <div class="kv"><span><i class="sw" style="background:#5598e7"></i>Гостюхин на руки</span><b id="r-gost14">—</b></div>
+      <div class="kv"><span><i class="sw" style="background:#5598e7"></i>Гостюхин, доля от цены</span><b id="r-gost14">—</b></div>
       <div class="kv obor"><span><i class="sw" style="background:#3ddc84"></i>Оборотка <small class="hint" style="margin:0">доп. расходы, хвост округления, надбавка</small></span><b id="r-obor">—</b></div>
       <div class="kv not-ad"><span><i class="sw" style="background:#eb6834"></i>ИП Брылин</span><b id="r-bryl">—</b></div>
       <div class="kv"><span><i class="sw" style="background:#3ddc84"></i>Петрушенко</span><b id="r-petr">—</b></div>
       <div class="kv"><span><i class="sw" style="background:#ffd60a"></i>Админ (Мельников)</span><b id="r-adm">—</b></div>
-      <p class="hint" style="margin:12px 0 0">В таблице колонка «Гостюхин» = на руки + оборотка: <b id="r-gost" style="color:var(--text)">—</b>.</p>
+      <p class="hint" style="margin:12px 0 0">В таблице колонка «Гостюхин» = доля + оборотка: <b id="r-gost" style="color:var(--text)">—</b>.</p>
 
       <details>
         <summary>Подробный расчёт и ставки</summary>
         <div class="in">
-          <table>
-            <thead><tr><th>Участник</th><th class="r">На руки</th><th class="r">Ставка</th><th class="r">К перечислению</th></tr></thead>
+          <div class="parts-wrap"><table id="parts-table">
+            <thead><tr><th>Участник</th><th class="r">Сумма</th><th class="r">Ставка</th></tr></thead>
             <tbody id="parts"></tbody>
-          </table>
-          <p class="hint" style="margin:12px 0 0">Как в листе «АК47-ТГК Осень 2026». Брылин и админ: к перечислению ÷ 0,93. Петрушенко: 10 % от чистой (цена минус НДС 5 % и УСН 6 %), к перечислению × 1,05 ÷ 0,94. Админ: 7 % от Гостюхина, Брылина и Петрушенко на руки. Доп. расходы, хвост округления до 1 000 и всё, что накинули сверху в «Цене по договору», уходят в оборотку. Ставки можно поправить в таблице выше — расчёт пересчитается. <span id="p-check"></span></p>
+          </table></div>
+          <p class="hint" style="margin:12px 0 0">Общая цена концерта делится: Петрушенко 10 %, Брылин (обычно 100 000), остальное Гостюхину. Сверху админ 7 % от цены и доп. расходы, затем УСН 6 % (÷ 0,94) и НДС 5 % (× 1,05), округление вверх до 1 000. Хвост округления и надбавка в «Цене по договору» уходят в оборотку. Проценты можно поправить в таблице выше. <span id="p-check"></span></p>
         </div>
       </details>
     </section>
@@ -291,7 +304,7 @@
     <div style="overflow-x:auto"><table><thead><tr><th>Дата</th><th>Город</th><th>Заказчик</th><th class="r">Сумма</th><th></th></tr></thead><tbody id="recent"><tr><td colspan="5" class="hint">загрузка…</td></tr></tbody></table></div>
   </section>
 
-  <p class="foot" id="foot">Как разносим приход: НДС = сумма × 5/105 → УСН = (сумма − НДС) × 6 % → Брылин ÷ 0,93, Петрушенко 10 % от чистой, админ 7 % ÷ 0,93 → Гостюхин на руки → остальное (доп. расходы, хвост округления) оборотка.</p>
+  <p class="foot" id="foot">Как разносим приход: НДС = сумма × 5/105 → УСН = (сумма − НДС) × 6 % → Брылин, Петрушенко 10 %, админ 7 % → Гостюхин = остаток (доля + оборотка).</p>
 </div>
 
 <!-- подтверждение -->
@@ -315,7 +328,7 @@ const fmt = x => (Math.round(x * 100) / 100).toLocaleString('ru-RU', { minimumFr
 const fmt0 = x => Math.round(x).toLocaleString('ru-RU') + ' ₽';
 const parseNum = s => { const t = String(s ?? '').replace(/\s|₽/g, '').replace(',', '.'); const n = Number(t.replace('%', '')); if (!isFinite(n)) return 0; return t.indexOf('%') >= 0 ? n / 100 : n; };
 const TYPE_BG = { 'Концерт': '#d9ead3', 'Корпоратив': '#fce5cd', 'Фест': '#c9daf8', 'Тур': '#f7caac', 'Реклама': '#fff2cc' };
-const MONEY = ['gost', 'bryl', 'extra', 'sold'];
+const MONEY = ['price', 'bryl', 'extra', 'sold'];
 
 // ---------- города для подсказок ----------
 const CITIES_RU = ['Москва','Санкт-Петербург','Новосибирск','Екатеринбург','Казань','Нижний Новгород','Красноярск','Челябинск','Самара','Уфа','Ростов-на-Дону','Краснодар','Омск','Воронеж','Пермь','Волгоград','Саратов','Тюмень','Тольятти','Барнаул','Махачкала','Ижевск','Хабаровск','Ульяновск','Иркутск','Владивосток','Ярославль','Кемерово','Томск','Набережные Челны','Ставрополь','Оренбург','Новокузнецк','Балашиха','Рязань','Севастополь','Пенза','Чебоксары','Липецк','Калининград','Астрахань','Тула','Киров','Сочи','Курск','Улан-Удэ','Сургут','Тверь','Магнитогорск','Якутск','Брянск','Иваново','Владимир','Чита','Белгород','Нижний Тагил','Симферополь','Архангельск','Калуга','Волжский','Смоленск','Саранск','Череповец','Курган','Вологда','Орёл','Владикавказ','Подольск','Грозный','Мурманск','Тамбов','Петрозаводск','Стерлитамак','Нижневартовск','Кострома','Новороссийск','Йошкар-Ола','Химки','Таганрог','Комсомольск-на-Амуре','Сыктывкар','Нальчик','Нижнекамск','Шахты','Дзержинск','Орск','Братск','Благовещенск','Энгельс','Ангарск','Королёв','Великий Новгород','Старый Оскол','Мытищи','Псков','Люберцы','Бийск','Южно-Сахалинск','Армавир','Прокопьевск','Балаково','Абакан','Норильск','Рыбинск','Северодвинск','Петропавловск-Камчатский','Красногорск','Уссурийск','Волгодонск','Новочеркасск','Каменск-Уральский','Златоуст','Электросталь','Альметьевск','Салават','Миасс','Керчь','Находка','Копейск','Пятигорск','Рубцовск','Березники','Коломна','Майкоп','Одинцово','Хасавюрт','Ковров','Кисловодск','Нефтеюганск','Нефтекамск','Новочебоксарск','Серпухов','Щёлково','Домодедово','Первоуральск','Черкесск','Дербент','Орехово-Зуево','Невинномысск','Назрань','Димитровград','Кызыл','Обнинск','Новый Уренгой','Ессентуки','Каспийск','Октябрьский','Раменское','Долгопрудный','Камышин','Муром','Новомосковск','Жуковский','Северск','Ноябрьск','Евпатория','Артём','Пушкино','Арзамас','Ачинск','Бердск','Элиста','Ногинск','Елец','Сергиев Посад','Новошахтинск','Железногорск','Зеленодольск','Тобольск','Междуреченск','Сарапул','Ленинск-Кузнецкий','Воткинск','Ухта','Соликамск','Глазов','Магадан','Великие Луки','Мичуринск','Канск','Киселёвск','Новотроицк','Бузулук','Ялта','Каменск-Шахтинский','Губкин','Бугульма','Ейск','Реутов','Кинешма','Чайковский','Азов','Ханты-Мансийск','Биробиджан','Нарьян-Мар','Анадырь','Салехард','Горно-Алтайск','Анапа','Геленджик','Туапсе','Феодосия','Выборг','Гатчина','Клин','Дмитров','Егорьевск','Воскресенск','Ступино','Наро-Фоминск','Фрязино','Лобня','Ивантеевка','Дубна','Зеленоград','Тихвин','Кириши','Сосновый Бор','Всеволожск','Колпино','Пушкин','Апатиты','Мончегорск','Кандалакша','Котлас','Великий Устюг','Костомукша','Кондопога','Североморск','Печора','Усинск','Воркута','Корсаков','Холмск'];
@@ -352,74 +365,60 @@ setupCityAC();
 // ---------- доступ ----------
 let KEY = '';
 (function () {
-  // Ключ остаётся в адресе: так работают закладки и иконка «На экран Домой» на iPhone (у неё своя память, отдельная от Safari).
+  // Ключ запоминается в браузере и убирается из адресной строки (чистый адрес). Для иконки «На экран Домой» на iPhone,
+  // у которой своя память, стартовый адрес с ключом передаётся через манифест приложения (см. setManifest).
   const u = new URL(location.href); const k = u.searchParams.get('k');
   try {
-    if (k) localStorage.setItem(LS, k);
+    if (k) { localStorage.setItem(LS, k); u.searchParams.delete('k'); history.replaceState(null, '', u.pathname + (u.searchParams.toString() ? '?' + u.searchParams.toString() : '') + u.hash); }
     KEY = k || localStorage.getItem(LS) || '';
-    if (KEY && !k) { u.searchParams.set('k', KEY); history.replaceState(null, '', u.pathname + '?' + u.searchParams.toString() + u.hash); }
   } catch (e) { KEY = k || ''; }
 })();
-function showGate(msg) { $('app').hidden = true; $('done').hidden = true; $('recent-card').hidden = true; $('stamp').hidden = true; $('gate').hidden = false; $('gate-msg').textContent = msg || ''; $('gate-msg').classList.toggle('show', !!msg); }
-$('gate-go').onclick = () => { let k = $('gate-key').value.trim(); if (!k) return; const m = /[?&]k=([^&#\s]+)/.exec(k); if (m) k = m[1]; KEY = k; try { localStorage.setItem(LS, k); } catch (e) {} try { const u = new URL(location.href); u.searchParams.set('k', k); history.replaceState(null, '', u.pathname + '?' + u.searchParams.toString()); } catch (e) {} boot(); };
+function setManifest() {
+  if (!KEY) return;
+  const icon = 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><rect width="512" height="512" fill="#ffd60a"/><text x="256" y="336" font-family="Arial Black,Arial" font-weight="900" font-size="210" text-anchor="middle" fill="#0b0b0d">АК</text></svg>');
+  const man = { name: 'Калькулятор концерта', short_name: 'Калькулятор', start_url: location.pathname + '?k=' + encodeURIComponent(KEY), scope: location.pathname, display: 'standalone', background_color: '#0b0b0d', theme_color: '#0b0b0d', icons: [{ src: icon, sizes: 'any', type: 'image/svg+xml' }] };
+  let l = document.querySelector('link[rel="manifest"]'); if (!l) { l = document.createElement('link'); l.rel = 'manifest'; document.head.appendChild(l); }
+  l.href = 'data:application/manifest+json,' + encodeURIComponent(JSON.stringify(man));
+}
+function showGate(msg) { if (navigator.standalone) $('gate-hint').textContent = 'Иконка на экране Домой открылась без ключа. Вставьте сюда свою ссылку целиком один раз — дальше будет открываться сразу.'; $('app').hidden = true; $('done').hidden = true; $('recent-card').hidden = true; $('stamp').hidden = true; $('gate').hidden = false; $('gate-msg').textContent = msg || ''; $('gate-msg').classList.toggle('show', !!msg); }
+$('gate-go').onclick = () => { let k = $('gate-key').value.trim(); if (!k) return; const m = /[?&]k=([^&#\s]+)/.exec(k); if (m) k = m[1]; KEY = k; try { localStorage.setItem(LS, k); } catch (e) {} boot(); };
 $('gate-key').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); $('gate-go').click(); } });
 
 // ---------- расчёт (1:1 с листом «Калькулятор_концерт») ----------
-const rates = { bryl: 0.93, petr: 0.10, adm: 0.07 };   // как в листе «АК47-ТГК Осень 2026»: bryl — коэффициент ИП (на руки → к перечислению), petr/adm — проценты
+const rates = { petr: 0.10, adm: 0.07 };   // Петрушенко и админ — проценты от общей цены концерта
 const USN = 0.06, NDS = 0.05, AD_ADM = 0.03;   // реклама: админ 3 % от прихода
 const isAd = () => curType() === 'Реклама';
 const curType = () => (document.querySelector('input[name=type]:checked') || {}).value || 'Концерт';
 function calc() {
-  if (isAd()) return calcAd();
-  // 1:1 с листом «АК47-ТГК Осень 2026» (калькулятор тура): D3 УСН, D4 НДС, D5 админ, D6 Петрушенко, D7 коэффициент ИП
-  const L = parseNum($('gost').value), B = parseNum($('bryl').value), X = parseNum($('extra').value), S = parseNum($('sold').value);
-  const D3 = USN, D4 = NDS, D5 = rates.adm, D6 = rates.petr, D7 = rates.bryl;
-  const H = B === 0 ? 0 : r2(B / D7);                                   // Брылин к перечислению
-  const denom = 1 - D6 * (1 + D4) / (1 - D3) - D5 * D6 / D7;
-  const Cneed = (L + H + X + D5 * (L + B) / D7) / denom;                // нужная «чистая» (без НДС и УСН)
-  const Draw = r2(Cneed / (1 - D3) * (1 + D4));                         // итого с НДС до округления
-  const C27 = L > 0 ? Math.ceil(Draw / 1000) * 1000 : 0;                // расчётная цена: вверх до 1 000
-  // доли Петрушенко и админа — от чистой расчётной цены (как в листе тура)
-  const E0 = C27 * D4 / (1 + D4), F0 = (C27 - E0) * D3, Cn0 = r2(C27 - E0 - F0);
-  const petrHand = r2(D6 * Cn0), I = r2(petrHand * (1 + D4) / (1 - D3)); // Петрушенко: 10 % от чистой, сверху его УСН и НДС
-  const admHand = r2(D5 * (L + B + petrHand)), J = r2(admHand / D7);    // Админ: 7 % от (Гостюхин + Брылин + Петрушенко на руки), ÷ 0,93
-  // цена по договору: расчётная или круглее (больше) — разница целиком в оборотку
+  // Логика от 08.09.2026: P — общая цена концерта (на руки всем). Петрушенко 10 % от P, Брылин — ввод (обычно 100 000),
+  // Гостюхин = P − Петрушенко − Брылин. Админ 7 % от P сверху. Затем УСН 6 % (÷ 0,94) и НДС 5 % (× 1,05), вверх до 1 000.
+  const ad = isAd();
+  const P = parseNum($('price').value), B = ad ? 0 : parseNum($('bryl').value), X = parseNum($('extra').value), S = parseNum($('sold').value);
+  const petrHand = r2(rates.petr * P), I = petrHand;
+  const H = B;
+  const L = r2(P - petrHand - H);                                        // Гостюхин на руки
+  const admHand = r2((ad ? AD_ADM : rates.adm) * P), J = admHand;        // админ сверху
+  const base = P + J + X;                                                // всё, что должно остаться после налогов
+  const noVat = base / (1 - USN);                                        // цена без НДС, внутри УСН 6 %
+  const Draw = r2(noVat * (1 + NDS));                                    // итого с НДС до округления
+  const C27 = P > 0 ? Math.ceil(Draw / 1000) * 1000 : 0;                 // расчётная цена: вверх до 1 000
   const low = S > 0 && S < C27;
-  const sum = S > C27 ? S : C27;
-  const Eraw = sum * D4 / (1 + D4), Fraw = (sum - Eraw) * D3;
-  const E = r2(Eraw), F = r2(Fraw), Cn = r2(sum - Eraw - Fraw);
-  const gostRest = r2(sum - Eraw - Fraw - H - I - J);                   // колонка «Гостюхин» в таблице = на руки + оборотка (доп. расходы внутри)
-  const obor = r2(gostRest - L);                                        // оборотка: доп. расходы, хвост округления и надбавка сверху
-  const C22 = r2(L + H + X + I + J);                                    // все выплаты по концерту
-  const C33 = r2(Cn - (L + H + I + J + obor));                          // служебная проверка (всегда 0): доп. расходы внутри оборотки
-  return { C14: L, C15: B, C17: X, C18: petrHand, C19: admHand, E14: L, E15: H, E16: 0, E17: X, E18: I, E19: J,
-           C22, C23: F, C24: r2(sum - E), C25: E, C26: Draw, C27, C33, C10: S, sum, nds: E, usn: F, gostRest, obor, low };
-}
-function calcAd() {
-  // Реклама: Гостюхин на руки задан. Петрушенко 10 % от Гостюхина (+ его УСН и НДС), админ 3 % от (Гостюхин + Петрушенко на руки) ÷ 0,93,
-  // сверху УСН 6 % и НДС 5 %, цена вверх до 1 000, хвост в оборотку. Брылина нет.
-  const L = parseNum($('gost').value), X = parseNum($('extra').value), S = parseNum($('sold').value);
-  const petrHand = r2(rates.petr * L), I = r2(petrHand * (1 + NDS) / (1 - USN));
-  const admHand = r2(AD_ADM * (L + petrHand)), J = r2(admHand / rates.bryl);
-  const Cneed = L + I + J + X;
-  const Draw = r2(Cneed / (1 - USN) * (1 + NDS));
-  const C27 = L > 0 ? Math.ceil(Draw / 1000) * 1000 : 0;
-  const low = S > 0 && S < C27;
-  const sum = S > C27 ? S : C27;
+  const sum = S > C27 ? S : C27;                                         // что встанет в таблицу
   const Eraw = sum * NDS / (1 + NDS), Fraw = (sum - Eraw) * USN;
   const E = r2(Eraw), F = r2(Fraw), Cn = r2(sum - Eraw - Fraw);
-  const gostRest = r2(sum - Eraw - Fraw - I - J);
+  const gostRest = r2(sum - Eraw - Fraw - H - I - J);                    // колонка «Гостюхин» в таблице = доля + оборотка (доп. расходы внутри)
   const obor = r2(gostRest - L);
-  const C22 = r2(L + I + J + X);
-  return { C14: L, C15: 0, C17: X, C18: petrHand, C19: admHand, E14: L, E15: 0, E16: 0, E17: X, E18: I, E19: J,
-           C22, C23: F, C24: r2(sum - E), C25: E, C26: Draw, C27, C33: r2(Cn - (L + I + J + obor)), C10: S, sum, nds: E, usn: F, gostRest, obor, low, ad: true };
+  const C22 = r2(L + H + X + I + J);
+  const C33 = r2(Cn - (L + H + I + J + obor));
+  return { P, C14: L, C15: H, C17: X, C18: petrHand, C19: admHand, E14: L, E15: H, E16: 0, E17: X, E18: I, E19: J,
+           C22, C23: F, C24: r2(sum - E), C25: E, C26: Draw, C27, C33, C10: S, sum, nds: E, usn: F, gostRest, obor, low, ad, gostNeg: P > 0 && L <= 0 };
 }
 let cur = null;
 function render() {
   const c = cur = calc();
   const ad = !!c.ad;
   $('app').classList.toggle('ad', ad);
-  const has = c.C14 > 0;
+  const has = c.P > 0;
   const F = (x) => has ? fmt(x) : '—';
   $('p-contract').textContent = has ? fmt0(c.sum) : '—'; $('p-contract').className = 'val' + (has ? '' : ' empty');
   $('p-min').textContent = has ? fmt0(c.C27) : '—';
@@ -429,22 +428,19 @@ function render() {
   $('p-payouts').textContent = F(c.C22); $('p-usn').textContent = F(c.C23); $('p-net').textContent = F(c.C24); $('p-nds').textContent = F(c.C25); $('p-gross').textContent = F(c.C26);
   const ok = Math.abs(c.C33) < 0.011; $('p-check').textContent = has ? (ok ? 'Служебная проверка формул: 0.' : 'Проверка формул: ' + c.C33.toFixed(2) + ' — так быть не должно.') : '';
   $('p-check').style.color = ok ? '' : 'var(--err)';
-  const rows = ad ? [
-    ['Гостюхин (Витя АК), остаётся на ИП', c.C14, '', c.E14],
-    ['Доп. расходы по безналу', c.C17, '', c.E17],
-    ['Петрушенко, ' + (rates.petr * 100).toLocaleString('ru-RU') + ' % от Гостюхина', c.C18, 'petr', c.E18],
-    ['Админ (Мельников), 3 % от Гостюхина и Петрушенко, ÷ коэффициент', c.C19, '', c.E19],
-  ] : [
-    ['Гостюхин (Витя АК), остаётся на ИП', c.C14, '', c.E14],
-    ['ИП Брылин (Макс АК), к перечислению ÷ коэффициент', c.C15, 'bryl', c.E15],
-    ['Доп. расходы по безналу', c.C17, '', c.E17],
-    ['Петрушенко, ' + (rates.petr * 100).toLocaleString('ru-RU') + ' % от чистой', c.C18, 'petr', c.E18],
-    ['Админ (Мельников), ' + (rates.adm * 100).toLocaleString('ru-RU') + ' % от Гостюхина, Брылина и Петрушенко, ÷ коэффициент', c.C19, 'adm', c.E19],
+  const rows = [
+    ['Гостюхин (Витя АК), остаток от цены', c.C14, ''],
+    ...(ad ? [] : [['ИП Брылин (Макс АК)', c.C15, '']]),
+    ['Петрушенко, ' + (rates.petr * 100).toLocaleString('ru-RU') + ' % от цены', c.C18, 'petr'],
+    ['Админ (Мельников), ' + ((ad ? AD_ADM : rates.adm) * 100).toLocaleString('ru-RU') + ' % от цены, сверху', c.C19, ad ? '' : 'adm'],
+    ['Доп. расходы по безналу, сверху', c.C17, ''],
   ];
-  $('parts').innerHTML = rows.map(([n, hand, rk, wire]) => `<tr><td>${n}</td><td class="r">${fmt(hand)}</td><td class="r">${rk ? `<input class="rate-in" data-rate="${rk}" value="${rk === 'bryl' ? String(rates.bryl).replace('.', ',') : (rates[rk] * 100).toLocaleString('ru-RU') + ' %'}">` : '—'}</td><td class="r"><b>${fmt(wire)}</b></td></tr>`).join('');
+  $('parts').innerHTML = rows.map(([n, hand, rk]) => `<tr><td>${n}</td><td class="r" data-l="Сумма"><b>${fmt(hand)}</b></td><td class="r" data-l="Ставка">${rk ? `<input class="rate-in" data-rate="${rk}" value="${(rates[rk] * 100).toLocaleString('ru-RU') + ' %'}">` : '—'}</td></tr>`).join('');
   document.querySelectorAll('.rate-in').forEach(i => i.addEventListener('change', e => { const v = parseNum(e.target.value); if (v > 0 && v < 1) rates[e.target.dataset.rate] = v; render(); }));
   $('r-sum').textContent = F(c.sum); $('r-nds').textContent = F(c.nds); $('r-usn').textContent = F(c.usn); $('r-gost').textContent = F(c.gostRest); $('r-gost14').textContent = F(c.C14); $('r-obor').textContent = F(c.obor);
   $('petr').value = has ? c.C18.toLocaleString('ru-RU', { maximumFractionDigits: 2 }) : '0';
+  $('gost').value = has ? c.C14.toLocaleString('ru-RU', { maximumFractionDigits: 2 }) : '0';
+  $('gost').classList.toggle('bad', !!c.gostNeg);
   $('r-bryl').textContent = F(c.E15); $('r-petr').textContent = F(c.E18); $('r-adm').textContent = F(c.E19);
 }
 MONEY.forEach(id => {
@@ -464,13 +460,15 @@ function validate() {
   const ad = isAd();
   document.querySelectorAll('#app [data-req]').forEach(el => {
     if (ad && el.id === 'bryl') { el.classList.remove('bad'); return; }
+    if (el.id === 'gost') return;
     const empty = el.value.trim() === '';
     el.classList.toggle('bad', empty);
     if (empty) { missing.push(el.dataset.req); first = first || el; }
   });
   const other = [];
   if (!missing.length && cur && cur.low) { other.push('Цена по договору меньше расчётной ' + fmt0(cur.C27) + '.'); $('sold').classList.add('bad'); first = first || $('sold'); }
-  if (!missing.length && !other.length && !(cur && cur.C14 > 0)) { other.push('Гостюхин на руки должен быть больше нуля.'); $('gost').classList.add('bad'); first = first || $('gost'); }
+  if (!missing.length && !other.length && !(cur && cur.P > 0)) { other.push('Цена концерта должна быть больше нуля.'); $('price').classList.add('bad'); first = first || $('price'); }
+  if (!missing.length && !other.length && cur && cur.gostNeg) { other.push('Гостюхину ничего не остаётся: уменьшите Брылина или увеличьте цену.'); $('bryl').classList.add('bad'); first = first || $('bryl'); }
   if (missing.length || other.length) {
     $('err').textContent = [missing.length ? 'Не заполнено: ' + missing.join(', ') + '.' : '', ...other].filter(Boolean).join(' ');
     $('err').classList.add('show');
@@ -484,13 +482,14 @@ function validate() {
 
 // ---------- сброс ----------
 function resetAll(keepDate) {
-  ['city', 'gost'].forEach(id => { $(id).value = ''; $(id).classList.remove('bad'); });
+  ['city', 'price'].forEach(id => { $(id).value = ''; $(id).classList.remove('bad'); });
+  $('gost').value = '0'; $('gost').classList.remove('bad');
   $('extra').value = '0'; $('extra').classList.remove('bad'); $('sold').value = ''; $('sold').classList.remove('bad');
   $('bryl').value = '100 000'; $('bryl').classList.remove('bad');
   if (!keepDate) $('date').value = new Date().toISOString().slice(0, 10);
   $('date').classList.remove('bad');
   document.querySelector('input[name=type][value="Концерт"]').checked = true;
-  Object.assign(rates, { bryl: 0.93, petr: 0.10, adm: 0.07 });
+  Object.assign(rates, { petr: 0.10, adm: 0.07 });
   hideErr(); render();
 }
 $('reset').onclick = () => { resetAll(); window.scrollTo({ top: 0, behavior: 'smooth' }); };
@@ -500,7 +499,8 @@ $('done-new').onclick = () => { $('done').hidden = true; $('app').hidden = false
 async function api(method, payload) {
   const opt = method === 'POST' ? { method: 'POST', body: JSON.stringify(payload), headers: { 'Content-Type': 'text/plain;charset=utf-8' }, redirect: 'follow' } : { method: 'GET', redirect: 'follow' };
   const url = method === 'POST' ? API_URL : API_URL + '?k=' + encodeURIComponent(KEY) + '&t=' + Date.now();
-  const res = await fetch(url, opt);
+  const ctrl = new AbortController(); const tm = setTimeout(() => ctrl.abort(), 45000); opt.signal = ctrl.signal;
+  let res; try { res = await fetch(url, opt); } finally { clearTimeout(tm); }
   const txt = await res.text();
   try { return JSON.parse(txt); } catch (e) { throw new Error('таблица ответила не по-русски: ' + txt.slice(0, 80)); }
 }
@@ -514,17 +514,29 @@ function fillRefs(refs) {
 function stamp(cls, text) { const s = $('stamp'); s.hidden = false; s.className = 'stamp ' + cls; $('stamp-t').textContent = text; }
 async function boot() {
   if (!KEY) { showGate(''); return; }
-  $('gate').hidden = true; $('app').hidden = false; $('recent-card').hidden = false;
+  $('gate').hidden = true; $('app').hidden = false; $('recent-card').hidden = false; setManifest();
   if (!$('date').value) $('date').value = new Date().toISOString().slice(0, 10);
   render();
   if (!API_URL || API_URL.indexOf('http') !== 0) { stamp('bad', 'таблица не подключена'); return; }
-  stamp('', 'связь с таблицей…');
+  loadRefs();
+}
+// Скрипт Google иногда отвечает 30+ секунд или отдаёт ошибку — пробуем до 3 раз, потом даём кнопку «повторить».
+let refsLoaded = false;
+async function loadRefs(attempt) {
+  attempt = attempt || 1;
+  stamp('', attempt > 1 ? `связь с таблицей… попытка ${attempt}` : 'связь с таблицей…');
+  $('recent').innerHTML = '<tr><td colspan="5" class="hint">загрузка…</td></tr>';
   try {
     const d = await api('GET');
     if (!d.ok) { showGate(d.error || 'Доступа нет'); try { localStorage.removeItem(LS); } catch (e) {} return; }
     fillRefs(d.refs); stamp('ok', 'таблица на связи');
-    $('foot').textContent += ' Личная ссылка: ' + ({ admin: 'Мельников', gost: 'Гостюхин', petr: 'Петрушенко' }[d.role] || d.role) + '.';
-  } catch (e) { stamp('bad', 'нет связи с таблицей'); }
+    if (!refsLoaded) { refsLoaded = true; $('foot').textContent += ' Личная ссылка: ' + ({ admin: 'Мельников', gost: 'Гостюхин', petr: 'Петрушенко' }[d.role] || d.role) + '.'; }
+  } catch (e) {
+    if (attempt < 3) { setTimeout(() => loadRefs(attempt + 1), 4000); return; }
+    stamp('bad', 'нет связи с таблицей');
+    $('recent').innerHTML = '<tr><td colspan="5" class="hint">Таблица не ответила. <a href="#" id="recent-retry">Повторить</a></td></tr>';
+    $('recent-retry').onclick = ev => { ev.preventDefault(); loadRefs(1); };
+  }
 }
 
 // ---------- отправка ----------
@@ -539,7 +551,7 @@ $('app').addEventListener('submit', e => {
   const row = rowData();
   $('cf-body').innerHTML = [
     ['Дата', row.date.split('-').reverse().join('.')], ['Тип', row.type], ['Город', row.city],
-    ['Сумма в таблицу', fmt(row.sum)], ['Гостюхин на руки', fmt(cur.C14)], ['Оборотка', fmt(cur.obor)]
+    ['Цена концерта', fmt(cur.P)], ['Сумма в таблицу', fmt(row.sum)], ['Гостюхин', fmt(cur.C14)], ['Оборотка', fmt(cur.obor)]
   ].map(([k, v]) => `<div class="kv"><span>${k}</span><b>${v}</b></div>`).join('');
   $('veil').hidden = false;
 });
@@ -558,7 +570,7 @@ $('cf-yes').onclick = async () => {
     lastSaved = { date: row.date.split('-').reverse().join('.'), city: row.city, sum: row.sum };
     $('done-rows').innerHTML = [
       ['Приход в таблицу', fmt(row.sum), true], ['НДС 5 %', fmt(d.nds)], ['УСН 6 %', fmt(d.usn)],
-      ['Гостюхин (на руки + оборотка)', fmt(d.gost)], ...(cur.ad ? [] : [['ИП Брылин', fmt(row.bryl)]]), ['Петрушенко', fmt(row.petr)], ['Админ', fmt(row.adm)]
+      ['Гостюхин (доля + оборотка)', fmt(d.gost)], ...(cur.ad ? [] : [['ИП Брылин', fmt(row.bryl)]]), ['Петрушенко', fmt(row.petr)], ['Админ', fmt(row.adm)]
     ].map(([k, v, t]) => `<div class="kv${t ? ' total' : ''}"><span>${k}</span><b>${v}</b></div>`).join('');
     $('app').hidden = true; $('done').hidden = false;
     window.scrollTo({ top: 0, behavior: 'smooth' });
